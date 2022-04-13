@@ -1,6 +1,6 @@
 from card import Card
 import matplotlib.pyplot as plt
-import random as r
+import random
 import time
 
 
@@ -41,7 +41,7 @@ class Game:
         print(f"{info_name}{info_data} - {self.p1.name}: {self.p1.balance}, {self.p2.name}: {self.p2.balance}")
 
     def choose_cards(self):
-        self.p1.card, self.p2.card = r.sample(self.cards, k=2)
+        self.p1.card, self.p2.card = random.sample(self.cards, k=2)
 
         if self.display_text:
             for p in self.players:

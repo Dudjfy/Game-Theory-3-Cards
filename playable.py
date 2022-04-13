@@ -1,4 +1,8 @@
+import random
+
 import numpy as np
+
+from betting import OpenerBetting, DealerBetting
 
 
 class Playable:
@@ -113,3 +117,37 @@ class SimpleAI(Playable):
             return "f"
         elif self.card.value == 3:
             return "b"
+
+
+class BluffingAI(Playable):
+    def __init__(self, name, initial_balance=10000, betting_amount=1):
+        super().__init__(name, initial_balance, betting_amount)
+        self.opener_betting = OpenerBetting()
+        self.dealer_betting = DealerBetting()
+
+    def play_opener(self):
+        rand = random.random()
+        if self.card.value == 1:
+            return "b" if rand < self.opener_betting.bluff_on_1 else "c"
+        elif self.card.value == 2:
+            return "b" if rand < self.opener_betting.bluff_on_2 else "c"
+        elif self.card.value == 3:
+            return "c" if rand < self.opener_betting.bluff_on_3 else "b"
+
+    def play_dealer(self, opener_choice):
+        rand = random.random()
+        if self.card.value == 1:
+            if opener_choice == "c":
+                return "b" if rand < self.dealer_betting.bluff_on_1 else "c"
+            else:
+                return "f"
+        elif self.card.value == 2:
+            if opener_choice == "c":
+                return "c"
+            elif opener_choice == "b":
+                return "b" if rand < self.dealer_betting.bluff_on_2 else "f"
+        elif self.card.value == 3:
+            return "b"
+
+    def play_opener_choice_on_dealer_bet(self, opener_choice):
+        return self.play_dealer(opener_choice)
