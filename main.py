@@ -131,7 +131,7 @@ class Card:
 
 
 class Game:
-	def __init__(self, p1, p2, games=1):
+	def __init__(self, p1, p2, games=1, display_text=True):
 		self.games = games
 		self.score_p1 = 0
 		self.score_p2 = 0
@@ -139,6 +139,7 @@ class Game:
 		self.p1 = p1
 		self.p2 = p2
 		self.players = [self.p1, self.p2]
+		self.display_text = display_text
 
 		self.pool = 0
 		self.opener = None
@@ -155,22 +156,23 @@ class Game:
 
 		return self.pool
 
-	def choose_opener_and_dealer(self, i, print_outcome=True):
+	def choose_opener_and_dealer(self, i):
 		self.opener = self.p1 if i % 2 == 0 else self.p2
 		self.dealer = self.p2 if i % 2 == 0 else self.p1
 
-		if print_outcome:
+		if self.display_text:
 			print(f"Opener: {self.opener.name}, Dealer: {self.dealer.name}")
 
 	def print_info(self, info_name, info_data):
 		print(f"{info_name}{info_data} - {self.p1.name}: {self.p1.balance}, {self.p2.name}: {self.p2.balance}")
 
-	def choose_cards(self, print_outcome=True):
+	def choose_cards(self):
 		self.p1.card, self.p2.card = r.sample(self.cards, k=2)
 
-		if print_outcome:
+		if self.display_text:
 			for p in self.players:
-				print(f"{p.name} {p.card}")
+				print(f"\t{p.name} {p.card}", end="")
+			print()
 
 	def reset_values(self):
 		self.pool = 0
@@ -183,7 +185,8 @@ class Game:
 		self.reset_values()
 		self.players_bets()
 
-		self.print_info("Pool: ", self.pool)
+		if self.display_text:
+			self.print_info("Pool: ", self.pool)
 
 		self.choose_opener_and_dealer(game)
 		self.choose_cards()
@@ -192,8 +195,14 @@ class Game:
 		self.opener_choice = self.opener.play_opener()
 		self.dealer_choice = self.dealer.play_dealer(self.opener_choice)
 
+		if self.display_text:
+			print(f"\t\t{self.opener.name} - {self.opener_choice}")
+			print(f"\t\t{self.dealer.name} - {self.dealer_choice}")
+
 		if self.opener_choice == "c" and self.dealer_choice == "b":
 			self.opener_choice = self.opener.play_opener_choice_on_dealer_bet(self.dealer_choice)
+			if self.display_text:
+				print(f"\t\t{self.opener.name} - {self.opener_choice}")
 
 	def check_folds(self):
 		if self.opener_choice == "f":
@@ -204,12 +213,12 @@ class Game:
 			return False
 		return True
 
-	def pay_winner(self, winner, message_beginning="", message_end="", print_outcome=True):
+	def pay_winner(self, winner, message_beginning="", message_end=""):
 		winner.win(self.pool)
 
 		self.record_balance_changes()
 
-		if print_outcome:
+		if self.display_text:
 			print(f"{winner.name} {message_beginning} {self.pool}{message_end}")
 
 	def payout(self):
@@ -233,7 +242,8 @@ class Game:
 
 		self.payout()
 
-		self.print_final_outcome()
+		if self.display_text:
+			self.print_final_outcome()
 
 	def play_games(self):
 		for game in range(self.games):
@@ -243,7 +253,6 @@ class Game:
 
 	def print_results(self):
 		for p in self.players:
-			# print(p.balance_history)
 			plt.plot(p.balance_history)
 		plt.show()
 
@@ -252,6 +261,6 @@ class Game:
 			p.record_balance_change()
 
 
-g = Game(SimpleAI("AI 1"), SimpleAI("AI 2"), games=1000)
+g = Game(SimpleAI("AI 1"), SimpleAI("AI 2"), games=1000, display_text=False)
 g.play_games()
 g.print_results()
