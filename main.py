@@ -1,4 +1,5 @@
 import random as r
+import time
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,13 +9,14 @@ class Playable:
 	options_normal = ["b", "c", "f"]
 	options_on_bet = ["b", "f"]
 
-	def __init__(self, name, initial_balance=1000, betting_amount=1):
+	def __init__(self, name, initial_balance=10000, betting_amount=1):
 		self.name = name
 		self.balance = initial_balance
 		self.initial_balance = initial_balance
 		self.card = None
 		self.betting_amount = betting_amount
-		self.balance_history = np.empty(0, dtype=int)
+		self.balance_history = []
+		# self.balance_history = np.empty(0, dtype=int)
 		self.options = self.options_normal
 
 	def play(self):
@@ -50,7 +52,8 @@ class Playable:
 		self.balance_history = np.empty(1)
 
 	def record_balance_change(self):
-		self.balance_history = np.append(self.balance_history, self.balance)
+		self.balance_history.append(self.balance)
+		# self.balance_history = np.append(self.balance_history, self.balance)
 
 
 class Player(Playable):
@@ -245,15 +248,30 @@ class Game:
 		if self.display_text:
 			self.print_final_outcome()
 
-	def play_games(self):
+	def play_games(self, print_elapsed_time=False, print_portions=1, print_progress=False):
+		if print_elapsed_time:
+			start = time.time()
+
+		if print_progress:
+			print_step = self.games // print_portions
+
 		for game in range(self.games):
+			if print_progress:
+				if (game + 1) % print_step == 0:
+					print(f"{(100 // print_portions) * ((game // print_step) + 1)}%")
+
 			if not self.check_balance():
 				break
 			self.play_game(game)
 
+		if print_elapsed_time:
+			end = time.time()
+			print(f"{round(end - start, 2)}s")
+
 	def print_results(self):
 		for p in self.players:
-			plt.plot(p.balance_history)
+			plt.plot(p.balance_history, label=p.name)
+		plt.legend()
 		plt.show()
 
 	def record_balance_changes(self):
@@ -261,6 +279,8 @@ class Game:
 			p.record_balance_change()
 
 
-g = Game(SimpleAI("AI 1"), SimpleAI("AI 2"), games=1000, display_text=False)
-g.play_games()
+g = Game(SimpleAI("AI 1"), SimpleAI("AI 2"), games=100000, display_text=False)
+
+g.play_games(print_progress=True, print_portions=100, print_elapsed_time=True)
+
 g.print_results()
