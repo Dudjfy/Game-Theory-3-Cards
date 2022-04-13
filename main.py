@@ -2,13 +2,15 @@ import random as r
 
 
 class Playable:
-	options = ["b", "c", "f"]
+	options_normal = ["b", "c", "f"]
+	options_on_bet = ["b", "f"]
 
 	def __init__(self, name, balance_start=100, betting_amount=1):
 		self.name = name
 		self.balance = balance_start
 		self.card = None
 		self.betting_amount = betting_amount
+		self.options = self.options_normal
 
 	def play(self):
 		pass
@@ -16,7 +18,10 @@ class Playable:
 	def play_opener(self):
 		pass
 
-	def play_dealer(self):
+	def play_dealer(self, opener_choice):
+		pass
+
+	def play_opener_choice_on_dealer_bet(self, opener_choice):
 		pass
 
 	def check_balance(self):
@@ -41,34 +46,56 @@ class Player(Playable):
 		self.print_help = print_help
 
 	def play(self):
-		print(self.card)
-		if self.print_help:
-			print("b - bet (or call), c - check, f - fold")
-		inp = input(">>>").strip().lower()
-		if inp in self.options:
-			return inp
+		while True:
+			print(self.card)
+			if self.print_help:
+				print("b - bet (or call), c - check, f - fold")
+			inp = input(">>>").strip().lower()
+			if inp in self.options:
+				return inp
+			else:
+				print("Invalid command!")
 
 	def play_opener(self):
+		self.options = self.options_normal
 		self.play()
 
-	def play_dealer(self):
+	def play_dealer(self, opener_choice):
+		self.options = self.options_normal
+		if opener_choice == "b":
+			self.options = self.options_on_bet
+		self.play()
+
+	def play_opener_choice_on_dealer_bet(self, dealer_choice):
+		self.options = self.options_on_bet
 		self.play()
 
 
 class SimpleAI(Playable):
 	def play_opener(self):
 		if self.card.value == 1:
-			return "f"
+			return "c"
 		elif self.card.value == 2:
-			return "f"
+			return "c"
 		elif self.card.value == 3:
 			return "b"
 
-	def play_dealer(self):
+	def play_dealer(self, opener_choice):
 		if self.card.value == 1:
-			return "c"
+			return "f"
 		elif self.card.value == 2:
-			return "c"
+			if opener_choice == "c":
+				return "c"
+			elif opener_choice == "b":
+				return "f"
+		elif self.card.value == 3:
+			return "b"
+
+	def play_opener_choice_on_dealer_bet(self, opener_choice):
+		if self.card.value == 1:
+			return "f"
+		elif self.card.value == 2:
+			return "f"
 		elif self.card.value == 3:
 			return "b"
 
@@ -98,6 +125,8 @@ class Game:
 		self.pool = 0
 		self.opener = None
 		self.dealer = None
+		self.opener_choice = None
+		self.dealer_choice = None
 
 	def check_balance(self):
 		return all([p.check_balance() for p in self.players])
@@ -125,6 +154,13 @@ class Game:
 			for p in self.players:
 				print(f"{p.name} {p.card}")
 
+	def reset_values(self):
+		self.pool = 0
+		self.opener = None
+		self.dealer = None
+		self.opener_choice = None
+		self.dealer_choice = None
+
 	def initial_setup(self, game):
 		self.pool = 0
 		self.players_bets()
@@ -134,55 +170,55 @@ class Game:
 		self.choose_opener_and_dealer(game)
 		self.choose_cards()
 
+	def player_choices(self):
+		self.opener_choice = self.opener.play_opener()
+		self.dealer_choice = self.dealer.play_dealer(self.opener_choice)
+
+		if self.opener_choice == "c" and self.dealer_choice == "b":
+			self.opener_choice = self.opener.play_opener_choice_on_dealer_bet(self.dealer_choice)
+
+	def check_folds(self):
+		if self.opener_choice == "f":
+			self.pay_winner(self.dealer,  message_beginning="won", message_end=f", {self.opener.name} folded")
+			return False
+		if self.dealer_choice == "f":
+			self.pay_winner(self.opener, message_beginning="won", message_end=f", {self.dealer.name} folded")
+			return False
+		return True
+
+	def pay_winner(self, winner, message_beginning="", message_end="", print_outcome=True):
+		winner.win(self.pool)
+		if print_outcome:
+			print(f"{winner.name} {message_beginning} {self.pool}{message_end}")
+
+	def payout(self):
+		if not self.check_folds():
+			return
+
+		winner = self.dealer
+		if self.opener.card.value > self.dealer.card.value:
+			winner = self.opener
+
+		self.pay_winner(winner, message_beginning="got the larger card, won")
+
+	def print_final_outcome(self):
+		self.print_info("Final", "")
+		print()
+
 	def play_game(self, game):
 		self.initial_setup(game)
 
-		if not self.opener.play():
-			self.dealer.win(self.pool)
-			print(f"{self.opener.name} folded, {self.dealer.name} won {self.pool}")
-			print(f"Final - {self.p1.name}: {self.p1.balance}, {self.p2.name}: {self.p2.balance}")
-			print(" ")
-			continue
+		self.player_choices()
 
-		temp_bet = self.opener.bet()
-		if temp_bet > 0:
-			self.pool += temp_bet
-		else:
-			print(f"{self.opener.name} out of balance :(")
-			break
+		self.payout()
 
-		if not self.dealer.play():
-			self.opener.win(self.pool)
-
-			print(f"{self.dealer.name} folded, {self.opener.name} won {self.pool}")
-			print(f"Final - {self.p1.name}: {self.p1.balance}, {self.p2.name}: {self.p2.balance}")
-			print(" ")
-			continue
-
-		temp_bet = self.dealer.bet()
-		if temp_bet > 0:
-			self.pool += temp_bet
-		else:
-			print(f"{self.dealer.name} out of balance :(")
-			break
-
-		if self.opener.card.value > self.dealer.card.value:
-			self.opener.win(self.pool)
-			print(f"{self.dealer.name} got the larger card, won {self.pool}")
-		else:
-			print(f"{self.opener.name} got the larger card, won {self.pool}")
-
-			self.dealer.win(self.pool)
-
-		print(f"Final - {self.p1.name}: {self.p1.balance}, {self.p2.name}: {self.p2.balance}")
-		print(" ")
+		self.print_final_outcome()
 
 	def play_games(self):
 		for game in range(self.games):
 			if not self.check_balance():
 				break
 			self.play_game(game)
-
 
 
 g = Game(SimpleAI("AI 1"), SimpleAI("AI 2"), games=100)
