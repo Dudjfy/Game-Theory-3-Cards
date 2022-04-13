@@ -55,7 +55,7 @@ class Playable:
 
 
 class Player(Playable):
-    def __init__(self, name, balance_start=100, print_help=True):
+    def __init__(self, name, balance_start=10000, print_help=True):
         super().__init__(name, balance_start)
         self.print_help = print_help
 
@@ -64,7 +64,7 @@ class Player(Playable):
             print(self.card)
             if self.print_help:
                 print("b - bet (or call), c - check, f - fold")
-            inp = input(">>>").strip().lower()
+            inp = input(">>> ").strip().lower()
             if inp in self.options:
                 return inp
             else:

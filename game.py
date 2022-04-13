@@ -67,7 +67,12 @@ class Game:
 
     def player_choices(self):
         self.opener_choice = self.opener.play_opener()
+        if self.opener_choice == "b":
+            self.pool += self.opener.bet()
+
         self.dealer_choice = self.dealer.play_dealer(self.opener_choice)
+        if self.dealer_choice == "b":
+            self.pool += self.dealer.bet()
 
         if self.display_text:
             print(f"\t\t{self.opener.name} - {self.opener_choice}")
@@ -75,6 +80,8 @@ class Game:
 
         if self.opener_choice == "c" and self.dealer_choice == "b":
             self.opener_choice = self.opener.play_opener_choice_on_dealer_bet(self.dealer_choice)
+            if self.opener_choice == "b":
+                self.pool += self.opener.bet()
             if self.display_text:
                 print(f"\t\t{self.opener.name} - {self.opener_choice}")
 
