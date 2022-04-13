@@ -1,15 +1,20 @@
 import random as r
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 class Playable:
 	options_normal = ["b", "c", "f"]
 	options_on_bet = ["b", "f"]
 
-	def __init__(self, name, balance_start=100, betting_amount=1):
+	def __init__(self, name, initial_balance=1000, betting_amount=1):
 		self.name = name
-		self.balance = balance_start
+		self.balance = initial_balance
+		self.initial_balance = initial_balance
 		self.card = None
 		self.betting_amount = betting_amount
+		self.balance_history = np.empty(0, dtype=int)
 		self.options = self.options_normal
 
 	def play(self):
@@ -38,6 +43,14 @@ class Playable:
 
 	def set_card(self, card):
 		self.card = card
+
+	def reset(self):
+		self.balance = self.initial_balance
+		self.card = None
+		self.balance_history = np.empty(1)
+
+	def record_balance_change(self):
+		self.balance_history = np.append(self.balance_history, self.balance)
 
 
 class Player(Playable):
@@ -69,6 +82,11 @@ class Player(Playable):
 	def play_opener_choice_on_dealer_bet(self, dealer_choice):
 		self.options = self.options_on_bet
 		self.play()
+
+	def reset(self):
+		self.balance = self.initial_balance
+		self.card = None
+		self.options = self.options_normal
 
 
 class SimpleAI(Playable):
@@ -162,7 +180,7 @@ class Game:
 		self.dealer_choice = None
 
 	def initial_setup(self, game):
-		self.pool = 0
+		self.reset_values()
 		self.players_bets()
 
 		self.print_info("Pool: ", self.pool)
@@ -188,6 +206,9 @@ class Game:
 
 	def pay_winner(self, winner, message_beginning="", message_end="", print_outcome=True):
 		winner.win(self.pool)
+
+		self.record_balance_changes()
+
 		if print_outcome:
 			print(f"{winner.name} {message_beginning} {self.pool}{message_end}")
 
@@ -220,6 +241,17 @@ class Game:
 				break
 			self.play_game(game)
 
+	def print_results(self):
+		for p in self.players:
+			# print(p.balance_history)
+			plt.plot(p.balance_history)
+		plt.show()
 
-g = Game(SimpleAI("AI 1"), SimpleAI("AI 2"), games=100)
+	def record_balance_changes(self):
+		for p in self.players:
+			p.record_balance_change()
+
+
+g = Game(SimpleAI("AI 1"), SimpleAI("AI 2"), games=1000)
 g.play_games()
+g.print_results()
