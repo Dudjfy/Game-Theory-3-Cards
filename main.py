@@ -79,7 +79,7 @@ class Game:
 			for p in self.players:
 				pool += p.bet()
 			
-			print(f"Pool: {pool} - {self.p1.name}: {self.p1.money}, {self.p1.name}: {self.p2.money}")
+			print(f"Pool: {pool} - {self.p1.name}: {self.p1.money}, {self.p2.name}: {self.p2.money}")
 			
 			opener = r.choice(self.players)
 			if opener.name == "AI 1":
@@ -95,7 +95,7 @@ class Game:
 			if not opener.play():
 				dealer.win(pool)
 				print(f"{opener.name} folded, {dealer.name} won {pool}")
-				print(f"Final - {self.p1.name}: {self.p1.money}, {self.p1.name}: {self.p2.money}")
+				print(f"Final - {self.p1.name}: {self.p1.money}, {self.p2.name}: {self.p2.money}")
 				print(" ")
 				continue
 			
@@ -111,7 +111,7 @@ class Game:
 				opener.win(pool)
 				
 				print(f"{dealer.name} folded, {opener.name} won {pool}")
-				print(f"Final - {self.p1.name}: {self.p1.money}, {self.p1.name}: {self.p2.money}")
+				print(f"Final - {self.p1.name}: {self.p1.money}, {self.p2.name}: {self.p2.money}")
 				print(" ")
 				continue
 			
@@ -130,7 +130,7 @@ class Game:
 			
 				dealer.win(pool)
 			
-			print(f"Final - {self.p1.name}: {self.p1.money}, {self.p1.name}: {self.p2.money}")
+			print(f"Final - {self.p1.name}: {self.p1.money}, {self.p2.name}: {self.p2.money}")
 			print(" ")
 			
 			
