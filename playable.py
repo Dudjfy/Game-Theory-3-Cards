@@ -9,14 +9,22 @@ class Playable:
     options_normal = ["b", "c", "f"]
     options_on_bet = ["b", "f"]
 
-    def __init__(self, name, initial_balance=10000, betting_amount=1):
+    def __init__(self, name, initial_balance=10000, relative_balance=0, betting_amount=1, use_relative_balance=True):
         self.name = name
-        self.balance = initial_balance
-        self.initial_balance = initial_balance
         self.card = None
         self.betting_amount = betting_amount
         self.balance_history = []
         self.options = self.options_normal
+
+        self.balance = initial_balance
+        self.initial_balance = initial_balance
+        self.relative_balance = relative_balance
+        self.use_relative_balance = use_relative_balance
+
+    def get_balance(self):
+        if self.use_relative_balance:
+            return self.relative_balance
+        return self.balance
 
     def play(self):
         pass
@@ -31,32 +39,49 @@ class Playable:
         pass
 
     def check_balance(self):
+        if self.use_relative_balance:
+            return True
         return self.balance - self.betting_amount >= 0
 
     def bet(self):
+        if self.use_relative_balance:
+            self.relative_balance -= self.betting_amount
+            return self.betting_amount
+
         if self.check_balance():
             self.balance -= self.betting_amount
             return self.betting_amount
         return 0
 
     def win(self, amount):
-        self.balance += amount
+        if self.use_relative_balance:
+            self.relative_balance += amount
+        else:
+            self.balance += amount
 
     def set_card(self, card):
         self.card = card
 
     def reset(self):
-        self.balance = self.initial_balance
+        if self.use_relative_balance:
+            self.relative_balance = 0
+        else:
+            self.balance = self.initial_balance
+
         self.card = None
         self.balance_history = []
 
     def record_balance_change(self):
-        self.balance_history.append(self.balance)
+        if self.use_relative_balance:
+            self.balance_history.append(self.relative_balance)
+        else:
+            self.balance_history.append(self.balance)
 
 
 class Player(Playable):
-    def __init__(self, name, balance_start=10000, print_help=True):
-        super().__init__(name, balance_start)
+    def __init__(self, name, initial_balance=10000, relative_balance=0, betting_amount=1, use_relative_balance=True,
+                 print_help=True):
+        super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance)
         self.print_help = print_help
 
     def play(self):
@@ -85,8 +110,13 @@ class Player(Playable):
         self.play()
 
     def reset(self):
-        self.balance = self.initial_balance
+        if self.use_relative_balance:
+            self.relative_balance = 0
+        else:
+            self.balance = self.initial_balance
+
         self.card = None
+        self.balance_history = []
         self.options = self.options_normal
 
 
@@ -120,8 +150,8 @@ class SimpleAI(Playable):
 
 
 class BluffingAI(Playable):
-    def __init__(self, name, initial_balance=10000, betting_amount=1):
-        super().__init__(name, initial_balance, betting_amount)
+    def __init__(self, name, initial_balance=10000, relative_balance=0, betting_amount=1, use_relative_balance=True):
+        super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance)
         self.opener_betting = OpenerBetting()
         self.dealer_betting = DealerBetting()
 

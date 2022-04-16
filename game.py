@@ -38,7 +38,7 @@ class Game:
             print(f"Opener: {self.opener.name}, Dealer: {self.dealer.name}")
 
     def print_info(self, info_name, info_data):
-        print(f"{info_name}{info_data} - {self.p1.name}: {self.p1.balance}, {self.p2.name}: {self.p2.balance}")
+        print(f"{info_name}{info_data} - {self.p1.name}: {self.p1.get_balance()}, {self.p2.name}: {self.p2.get_balance()}")
 
     def choose_cards(self):
         self.p1.card, self.p2.card = random.sample(self.cards, k=2)
