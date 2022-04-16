@@ -175,7 +175,7 @@ class Game:
             end = time.time()
             print(f"{round(end - start, 2)}s")
 
-    def print_results(self):
+    def display_matplotlib_results(self):
         for p in self.players:
             plt.plot(p.balance_history, label=p.name)
         plt.legend()
