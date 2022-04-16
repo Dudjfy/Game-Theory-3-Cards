@@ -10,7 +10,7 @@ logging.basicConfig(filename="log.log", level=logging.DEBUG, format="%(message)s
 
 
 class Game:
-    def __init__(self, p1, p2, games=1, display_text=False, create_log=False):
+    def __init__(self, p1, p2, games=1, display_text=False, create_log=False, use_game_separators=True):
         self.games = games
         self.score_p1 = 0
         self.score_p2 = 0
@@ -18,13 +18,14 @@ class Game:
         self.p1 = p1
         self.p2 = p2
         self.players = [self.p1, self.p2]
-        self.display_text = display_text
 
         self.pool = 0
         self.opener = None
         self.dealer = None
         self.player_folded = False
 
+        self.display_text = display_text
+        self.use_game_separators = use_game_separators
         self.create_log = create_log
 
     def check_balance(self):
@@ -132,8 +133,14 @@ class Game:
         if self.display_text:
             self.print_info("Final", "")
             print()
+            if self.use_game_separators:
+                print("-" * 50)
+                print()
         if self.create_log:
-            logging.debug(f"")
+            logging.debug("")
+            if self.use_game_separators:
+                logging.debug("-" * 50)
+                logging.debug("")
 
     # @profile
     def play_game(self, game):
@@ -143,10 +150,7 @@ class Game:
 
         self.payout()
 
-        if self.display_text:
-            self.print_final_outcome()
-        if self.create_log:
-            self.print_final_outcome()
+        self.print_final_outcome()
 
     def play_games(self, print_elapsed_time=False, print_portions=1, print_progress=False):
         if print_elapsed_time:
