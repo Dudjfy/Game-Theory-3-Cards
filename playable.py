@@ -120,6 +120,23 @@ class Player(Playable):
         self.options = self.options_normal
 
 
+class RandomAI(Playable):
+    def play_opener(self, opponent_choice=None):
+        return random.choice(self.options_normal)
+
+    def play_dealer(self, opponent_choice):
+        if opponent_choice == "c":
+            return random.choice(self.options_normal)
+        elif opponent_choice == "b":
+            return random.choice(self.options_on_bet)
+
+    def play_opener_choice_on_dealer_bet(self, opponent_choice):
+        if opponent_choice == "c":
+            return random.choice(self.options_normal)
+        elif opponent_choice == "b":
+            return random.choice(self.options_on_bet)
+
+
 class SimpleAI(Playable):
     def play_opener(self, opponent_choice=None):
         if self.card.value == 1:
