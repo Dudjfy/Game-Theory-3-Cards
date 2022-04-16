@@ -26,18 +26,6 @@ class Playable:
             return self.relative_balance
         return self.balance
 
-    def play(self):
-        pass
-
-    def play_opener(self):
-        pass
-
-    def play_dealer(self, opener_choice):
-        pass
-
-    def play_opener_choice_on_dealer_bet(self, opener_choice):
-        pass
-
     def check_balance(self):
         if self.use_relative_balance:
             return True
@@ -77,6 +65,18 @@ class Playable:
         else:
             self.balance_history.append(self.balance)
 
+    def play(self):
+        pass
+
+    def play_opener(self, opponent_choice):
+        pass
+
+    def play_dealer(self, opponent_choice):
+        pass
+
+    def play_opener_choice_on_dealer_bet(self, opponent_choice):
+        pass
+
 
 class Player(Playable):
     def __init__(self, name, initial_balance=10000, relative_balance=0, betting_amount=1, use_relative_balance=True,
@@ -95,17 +95,17 @@ class Player(Playable):
             else:
                 print("Invalid command!")
 
-    def play_opener(self):
+    def play_opener(self, opponent_choice):
         self.options = self.options_normal
         self.play()
 
-    def play_dealer(self, opener_choice):
+    def play_dealer(self, opponent_choice):
         self.options = self.options_normal
-        if opener_choice == "b":
+        if opponent_choice == "b":
             self.options = self.options_on_bet
         self.play()
 
-    def play_opener_choice_on_dealer_bet(self, dealer_choice):
+    def play_opener_choice_on_dealer_bet(self, opponent_choice):
         self.options = self.options_on_bet
         self.play()
 
@@ -121,7 +121,7 @@ class Player(Playable):
 
 
 class SimpleAI(Playable):
-    def play_opener(self):
+    def play_opener(self, opponent_choice=None):
         if self.card.value == 1:
             return "c"
         elif self.card.value == 2:
@@ -129,18 +129,18 @@ class SimpleAI(Playable):
         elif self.card.value == 3:
             return "b"
 
-    def play_dealer(self, opener_choice):
+    def play_dealer(self, opponent_choice):
         if self.card.value == 1:
             return "f"
         elif self.card.value == 2:
-            if opener_choice == "c":
+            if opponent_choice == "c":
                 return "c"
-            elif opener_choice == "b":
+            elif opponent_choice == "b":
                 return "f"
         elif self.card.value == 3:
             return "b"
 
-    def play_opener_choice_on_dealer_bet(self, opener_choice):
+    def play_opener_choice_on_dealer_bet(self, opponent_choice):
         if self.card.value == 1:
             return "f"
         elif self.card.value == 2:
@@ -155,7 +155,7 @@ class BluffingAI(Playable):
         self.opener_betting = OpenerBetting()
         self.dealer_betting = DealerBetting()
 
-    def play_opener(self):
+    def play_opener(self, opponent_choice=None):
         rand = random.random()
         if self.card.value == 1:
             return "b" if rand < self.opener_betting.bluff_on_1 else "c"
@@ -164,20 +164,20 @@ class BluffingAI(Playable):
         elif self.card.value == 3:
             return "c" if rand < self.opener_betting.bluff_on_3 else "b"
 
-    def play_dealer(self, opener_choice):
+    def play_dealer(self, opponent_choice):
         rand = random.random()
         if self.card.value == 1:
-            if opener_choice == "c":
+            if opponent_choice == "c":
                 return "b" if rand < self.dealer_betting.bluff_on_1 else "c"
             else:
                 return "f"
         elif self.card.value == 2:
-            if opener_choice == "c":
+            if opponent_choice == "c":
                 return "c"
-            elif opener_choice == "b":
+            elif opponent_choice == "b":
                 return "b" if rand < self.dealer_betting.bluff_on_2 else "f"
         elif self.card.value == 3:
             return "b"
 
-    def play_opener_choice_on_dealer_bet(self, opener_choice):
-        return self.play_dealer(opener_choice)
+    def play_opener_choice_on_dealer_bet(self, opponent_choice):
+        return self.play_dealer(opponent_choice)

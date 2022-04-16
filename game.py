@@ -5,7 +5,7 @@ import time
 
 
 class Game:
-    def __init__(self, p1, p2, games=1, display_text=True):
+    def __init__(self, p1, p2, games=1, display_text=False):
         self.games = games
         self.score_p1 = 0
         self.score_p2 = 0
@@ -18,8 +18,9 @@ class Game:
         self.pool = 0
         self.opener = None
         self.dealer = None
-        self.opener_choice = None
-        self.dealer_choice = None
+        self.player_folded = False
+        # self.opener_choice = None
+        # self.dealer_choice = None
 
     def check_balance(self):
         return all([p.check_balance() for p in self.players])
@@ -52,8 +53,9 @@ class Game:
         self.pool = 0
         self.opener = None
         self.dealer = None
-        self.opener_choice = None
-        self.dealer_choice = None
+        self.player_folded = False
+        # self.opener_choice = None
+        # self.dealer_choice = None
 
     def initial_setup(self, game):
         self.reset_values()
@@ -65,34 +67,47 @@ class Game:
         self.choose_opener_and_dealer(game)
         self.choose_cards()
 
-    def player_choices(self):
-        self.opener_choice = self.opener.play_opener()
-        if self.opener_choice == "b":
-            self.pool += self.opener.bet()
+    def get_opposite_player(self, player):
+        if player is self.opener:
+            return self.dealer
+        else:
+            return self.opener
 
-        self.dealer_choice = self.dealer.play_dealer(self.opener_choice)
-        if self.dealer_choice == "b":
-            self.pool += self.dealer.bet()
-
+    def player_choice(self, player, play_method, opponent_choice=None):
+        player_choice = play_method(opponent_choice)
+        if player_choice == "b":
+            self.pool += player.bet()
         if self.display_text:
-            print(f"\t\t{self.opener.name} - {self.opener_choice}")
-            print(f"\t\t{self.dealer.name} - {self.dealer_choice}")
+            print(f"\t\t{player.name} - {player_choice}")
+        if player_choice == "f":
+            self.pay_winner(self.get_opposite_player(player),
+                            message_beginning="won", message_end=f", {player.name} folded")
+        return player_choice
 
-        if self.opener_choice == "c" and self.dealer_choice == "b":
-            self.opener_choice = self.opener.play_opener_choice_on_dealer_bet(self.dealer_choice)
-            if self.opener_choice == "b":
-                self.pool += self.opener.bet()
-            if self.display_text:
-                print(f"\t\t{self.opener.name} - {self.opener_choice}")
+    def player_choices(self):
+        # self.opener_choice = self.opener.play_opener()
+        # if self.opener_choice == "b":
+        #     self.pool += self.opener.bet()
+        # if self.display_text:
+        #     print(f"\t\t{self.opener.name} - {self.opener_choice}")
+        # if not self.check_folds():
+        #     return
 
-    def check_folds(self):
-        if self.opener_choice == "f":
-            self.pay_winner(self.dealer, message_beginning="won", message_end=f", {self.opener.name} folded")
-            return False
-        if self.dealer_choice == "f":
-            self.pay_winner(self.opener, message_beginning="won", message_end=f", {self.dealer.name} folded")
-            return False
-        return True
+        # self.dealer_choice = self.dealer.play_dealer(self.opener_choice)
+        # if self.dealer_choice == "b":
+        #     self.pool += self.dealer.bet()
+        # if self.display_text:
+        #     print(f"\t\t{self.dealer.name} - {self.dealer_choice}")
+        # if not self.check_folds():
+        #     return
+
+        opener_choice = self.player_choice(self.opener, self.opener.play_opener)
+        dealer_choice = self.player_choice(self.dealer, self.dealer.play_dealer, opener_choice)
+        if opener_choice == "c" and dealer_choice == "b":
+            opener_choice = self.player_choice(self.opener, self.opener.play_opener_choice_on_dealer_bet, dealer_choice)
+
+        if opener_choice == "f" or dealer_choice == "f":
+            self.player_folded = True
 
     def pay_winner(self, winner, message_beginning="", message_end=""):
         winner.win(self.pool)
@@ -103,7 +118,7 @@ class Game:
             print(f"{winner.name} {message_beginning} {self.pool}{message_end}")
 
     def payout(self):
-        if not self.check_folds():
+        if self.player_folded:
             return
 
         winner = self.dealer
