@@ -3,6 +3,10 @@ from card import Card
 import matplotlib.pyplot as plt
 import random
 import time
+import logging
+
+
+logging.basicConfig(filename="log.log", level=logging.DEBUG, format="%(message)s", filemode="w")
 
 
 class Game:
@@ -22,8 +26,6 @@ class Game:
         self.player_folded = False
 
         self.create_log = create_log
-        self.log_msg = ""
-        self.log_path = "log.txt"
 
     def check_balance(self):
         return all([p.check_balance() for p in self.players])
@@ -41,26 +43,23 @@ class Game:
         if self.display_text:
             print(f"Opener: {self.opener.name}, Dealer: {self.dealer.name}")
         if self.create_log:
-            self.log_msg += f"Opener: {self.opener.name}, Dealer: {self.dealer.name}\n"
+            logging.debug(f"Opener: {self.opener.name}, Dealer: {self.dealer.name}")
 
     def print_info(self, info_name, info_data):
-        print(f"{info_name}{info_data} - {self.p1.name}: {self.p1.get_balance()}, {self.p2.name}: {self.p2.get_balance()}")
+        if self.display_text:
+            print(f"{info_name}{info_data} - {self.p1.name}: {self.p1.get_balance()}, {self.p2.name}: {self.p2.get_balance()}")
         if self.create_log:
-            self.log_msg += f"{info_name}{info_data} - {self.p1.name}: {self.p1.get_balance()}, {self.p2.name}: {self.p2.get_balance()}\n"
+            logging.debug(f"{info_name}{info_data} - {self.p1.name}: {self.p1.get_balance()}, {self.p2.name}: {self.p2.get_balance()}")
 
     @profile
     def choose_cards(self):
         self.p1.card, self.p2.card = random.sample(self.cards, k=2)
 
         if self.display_text:
-            for p in self.players:
-                print(f"\t{p.name} {p.card}", end="")
-            print()
+            print(f"\t{self.p1.name} {self.p1.card} - {self.p2.name} {self.p2.card}")
 
         if self.create_log:
-            for p in self.players:
-                self.log_msg += f"\t{p.name} {p.card}"
-            self.log_msg += f"\n"
+            logging.debug(f"\t{self.p1.name} {self.p1.card} - {self.p2.name} {self.p2.card}")
 
     def reset_values(self):
         self.pool = 0
@@ -74,6 +73,8 @@ class Game:
         self.players_bets()
 
         if self.display_text:
+            self.print_info("Pool: ", self.pool)
+        if self.create_log:
             self.print_info("Pool: ", self.pool)
 
         self.choose_opener_and_dealer(game)
@@ -92,7 +93,7 @@ class Game:
         if self.display_text:
             print(f"\t\t{player.name} - {player_choice}")
         if self.create_log:
-            self.log_msg += f"\t\t{player.name} - {player_choice}\n"
+            logging.debug(f"\t\t{player.name} - {player_choice}")
         if player_choice == "f":
             self.pay_winner(self.get_opposite_player(player),
                             message_beginning="won", message_end=f", {player.name} folded")
@@ -115,7 +116,7 @@ class Game:
         if self.display_text:
             print(f"{winner.name} {message_beginning} {self.pool}{message_end}")
         if self.create_log:
-            self.log_msg += f"{winner.name} {message_beginning} {self.pool}{message_end}\n"
+            logging.debug(f"{winner.name} {message_beginning} {self.pool}{message_end}")
 
     def payout(self):
         if self.player_folded:
@@ -128,10 +129,11 @@ class Game:
         self.pay_winner(winner, message_beginning="got the larger card, won")
 
     def print_final_outcome(self):
-        self.print_info("Final", "")
-        print()
+        if self.display_text:
+            self.print_info("Final", "")
+            print()
         if self.create_log:
-            self.log_msg += f"\n"
+            logging.debug(f"")
 
     # @profile
     def play_game(self, game):
@@ -142,6 +144,8 @@ class Game:
         self.payout()
 
         if self.display_text:
+            self.print_final_outcome()
+        if self.create_log:
             self.print_final_outcome()
 
     def play_games(self, print_elapsed_time=False, print_portions=1, print_progress=False):
@@ -166,10 +170,6 @@ class Game:
         if print_elapsed_time:
             end = time.time()
             print(f"{round(end - start, 2)}s")
-
-        if self.create_log:
-            with open(self.log_path, "w") as log_file:
-                log_file.write(self.log_msg)
 
     def print_results(self):
         for p in self.players:
