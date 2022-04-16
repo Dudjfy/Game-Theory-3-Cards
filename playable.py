@@ -8,9 +8,24 @@ from betting import OpenerBetting, DealerBetting
 class Playable:
     options_normal = ["b", "c", "f"]
     options_on_bet = ["b", "f"]
+    colors = {
+        "black": "\033[0;30;40m",
+        "red": "\033[0;31;40m",
+        "green": "\033[0;32;40m",
+        "yellow": "\033[0;33;40m",
+        "blue": "\033[0;34;40m",
+        "purple": "\033[0;35;40m",
+        "cyan": "\033[0;36;40m",
+        "white": "\033[0;37;40m",
+        "default": "\033[0;0m",
+    }
+    default_color = "\033[0;0m"
 
-    def __init__(self, name, initial_balance=10000, relative_balance=0, betting_amount=1, use_relative_balance=True):
+    def __init__(self, name="No Name", initial_balance=10000, relative_balance=0, betting_amount=1,
+                 use_relative_balance=True, text_color="default"):
+        self.text_color = self.colors[text_color]
         self.name = name
+
         self.card = None
         self.betting_amount = betting_amount
         self.balance_history = []
@@ -20,6 +35,9 @@ class Playable:
         self.initial_balance = initial_balance
         self.relative_balance = relative_balance
         self.use_relative_balance = use_relative_balance
+
+    def set_text_color(self, color="default"):
+        self.text_color = self.colors[color]
 
     def get_balance(self):
         if self.use_relative_balance:
@@ -79,9 +97,9 @@ class Playable:
 
 
 class Player(Playable):
-    def __init__(self, name, initial_balance=10000, relative_balance=0, betting_amount=1, use_relative_balance=True,
-                 print_help=True):
-        super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance)
+    def __init__(self, name="No Name", initial_balance=10000, relative_balance=0, betting_amount=1,
+                 use_relative_balance=True, print_help=True, text_color="default"):
+        super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance, text_color)
         self.print_help = print_help
 
     def play(self):
@@ -167,8 +185,9 @@ class SimpleAI(Playable):
 
 
 class BluffingAI(Playable):
-    def __init__(self, name, initial_balance=10000, relative_balance=0, betting_amount=1, use_relative_balance=True):
-        super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance)
+    def __init__(self, name="No Name", initial_balance=10000, relative_balance=0, betting_amount=1,
+                 use_relative_balance=True, text_color="default"):
+        super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance, text_color)
         self.opener_betting = OpenerBetting()
         self.dealer_betting = DealerBetting()
 

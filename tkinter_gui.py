@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter import ttk
 
 from data_structures import SimpleAiData
+from game import Game
+from playable import RandomAI
 
 
 class RelPos:
@@ -42,7 +44,7 @@ class TkinterGUI:
 
         self.main_frame = MainFrame(self.root, self.size, self.pad, self.margin)
 
-        # self.game = Game()
+        # self.game = Game(RandomAI("Random AI 1"), RandomAI("Random AI 2"))
 
     def start(self, load_main_frame=True):
         if load_main_frame:

@@ -6,7 +6,7 @@ import time
 import logging
 
 
-logging.basicConfig(filename="log.log", level=logging.DEBUG, format="%(message)s", filemode="w")
+logging.basicConfig(filename="log.log", level=logging.INFO, format="%(message)s", filemode="w")
 
 
 class Game:
@@ -42,15 +42,21 @@ class Game:
         self.dealer = self.p2 if i % 2 == 0 else self.p1
 
         if self.display_text:
-            print(f"Opener: {self.opener.name}, Dealer: {self.dealer.name}")
+            print(f"Opener: {self.opener.text_color}{self.opener.name}{self.opener.default_color}, "
+                  f"Dealer: {self.dealer.text_color}{self.dealer.name}{self.dealer.default_color}")
         if self.create_log:
-            logging.debug(f"Opener: {self.opener.name}, Dealer: {self.dealer.name}")
+            logging.info(f"Opener: {self.opener.name}, "
+                         f"Dealer: {self.dealer.name}")
 
     def print_info(self, info_name, info_data):
         if self.display_text:
-            print(f"{info_name}{info_data} - {self.p1.name}: {self.p1.get_balance()}, {self.p2.name}: {self.p2.get_balance()}")
+            print(f"{info_name}{info_data} - "
+                  f"{self.p1.text_color}{self.p1.name}{self.p1.default_color}: {self.p1.get_balance()}, "
+                  f"{self.p2.text_color}{self.p2.name}{self.p2.default_color}: {self.p2.get_balance()}")
         if self.create_log:
-            logging.debug(f"{info_name}{info_data} - {self.p1.name}: {self.p1.get_balance()}, {self.p2.name}: {self.p2.get_balance()}")
+            logging.info(f"{info_name}{info_data} - "
+                         f"{self.p1.name}: {self.p1.get_balance()}, "
+                         f"{self.p2.name}: {self.p2.get_balance()}")
 
     @profile
     def choose_cards(self):
@@ -60,7 +66,7 @@ class Game:
             print(f"\t{self.p1.name} {self.p1.card} - {self.p2.name} {self.p2.card}")
 
         if self.create_log:
-            logging.debug(f"\t{self.p1.name} {self.p1.card} - {self.p2.name} {self.p2.card}")
+            logging.info(f"\t{self.p1.name} {self.p1.card} - {self.p2.name} {self.p2.card}")
 
     def reset_values(self):
         self.pool = 0
@@ -94,7 +100,7 @@ class Game:
         if self.display_text:
             print(f"\t\t{player.name} - {player_choice}")
         if self.create_log:
-            logging.debug(f"\t\t{player.name} - {player_choice}")
+            logging.info(f"\t\t{player.name} - {player_choice}")
         if player_choice == "f":
             self.pay_winner(self.get_opposite_player(player),
                             message_beginning="won", message_end=f", {player.name} folded")
@@ -117,7 +123,7 @@ class Game:
         if self.display_text:
             print(f"{winner.name} {message_beginning} {self.pool}{message_end}")
         if self.create_log:
-            logging.debug(f"{winner.name} {message_beginning} {self.pool}{message_end}")
+            logging.info(f"{winner.name} {message_beginning} {self.pool}{message_end}")
 
     def payout(self):
         if self.player_folded:
@@ -137,10 +143,10 @@ class Game:
                 print("-" * 50)
                 print()
         if self.create_log:
-            logging.debug("")
+            logging.info("")
             if self.use_game_separators:
-                logging.debug("-" * 50)
-                logging.debug("")
+                logging.info("-" * 50)
+                logging.info("")
 
     # @profile
     def play_game(self, game):
@@ -158,9 +164,6 @@ class Game:
 
         if print_progress:
             print_step = self.games // print_portions
-
-        if self.create_log:
-            self.log_msg = ""
 
         for game in range(self.games):
             if print_progress:
