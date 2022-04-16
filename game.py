@@ -1,3 +1,4 @@
+from line_profiler_pycharm import profile
 from card import Card
 import matplotlib.pyplot as plt
 import random
@@ -5,7 +6,7 @@ import time
 
 
 class Game:
-    def __init__(self, p1, p2, games=1, display_text=False):
+    def __init__(self, p1, p2, games=1, display_text=False, create_log=False):
         self.games = games
         self.score_p1 = 0
         self.score_p2 = 0
@@ -19,8 +20,10 @@ class Game:
         self.opener = None
         self.dealer = None
         self.player_folded = False
-        # self.opener_choice = None
-        # self.dealer_choice = None
+
+        self.create_log = create_log
+        self.log_msg = ""
+        self.log_path = "log.txt"
 
     def check_balance(self):
         return all([p.check_balance() for p in self.players])
@@ -37,10 +40,15 @@ class Game:
 
         if self.display_text:
             print(f"Opener: {self.opener.name}, Dealer: {self.dealer.name}")
+        if self.create_log:
+            self.log_msg += f"Opener: {self.opener.name}, Dealer: {self.dealer.name}\n"
 
     def print_info(self, info_name, info_data):
         print(f"{info_name}{info_data} - {self.p1.name}: {self.p1.get_balance()}, {self.p2.name}: {self.p2.get_balance()}")
+        if self.create_log:
+            self.log_msg += f"{info_name}{info_data} - {self.p1.name}: {self.p1.get_balance()}, {self.p2.name}: {self.p2.get_balance()}\n"
 
+    @profile
     def choose_cards(self):
         self.p1.card, self.p2.card = random.sample(self.cards, k=2)
 
@@ -49,14 +57,18 @@ class Game:
                 print(f"\t{p.name} {p.card}", end="")
             print()
 
+        if self.create_log:
+            for p in self.players:
+                self.log_msg += f"\t{p.name} {p.card}"
+            self.log_msg += f"\n"
+
     def reset_values(self):
         self.pool = 0
         self.opener = None
         self.dealer = None
         self.player_folded = False
-        # self.opener_choice = None
-        # self.dealer_choice = None
 
+    @profile
     def initial_setup(self, game):
         self.reset_values()
         self.players_bets()
@@ -79,28 +91,14 @@ class Game:
             self.pool += player.bet()
         if self.display_text:
             print(f"\t\t{player.name} - {player_choice}")
+        if self.create_log:
+            self.log_msg += f"\t\t{player.name} - {player_choice}\n"
         if player_choice == "f":
             self.pay_winner(self.get_opposite_player(player),
                             message_beginning="won", message_end=f", {player.name} folded")
         return player_choice
 
     def player_choices(self):
-        # self.opener_choice = self.opener.play_opener()
-        # if self.opener_choice == "b":
-        #     self.pool += self.opener.bet()
-        # if self.display_text:
-        #     print(f"\t\t{self.opener.name} - {self.opener_choice}")
-        # if not self.check_folds():
-        #     return
-
-        # self.dealer_choice = self.dealer.play_dealer(self.opener_choice)
-        # if self.dealer_choice == "b":
-        #     self.pool += self.dealer.bet()
-        # if self.display_text:
-        #     print(f"\t\t{self.dealer.name} - {self.dealer_choice}")
-        # if not self.check_folds():
-        #     return
-
         opener_choice = self.player_choice(self.opener, self.opener.play_opener)
         dealer_choice = self.player_choice(self.dealer, self.dealer.play_dealer, opener_choice)
         if opener_choice == "c" and dealer_choice == "b":
@@ -116,6 +114,8 @@ class Game:
 
         if self.display_text:
             print(f"{winner.name} {message_beginning} {self.pool}{message_end}")
+        if self.create_log:
+            self.log_msg += f"{winner.name} {message_beginning} {self.pool}{message_end}\n"
 
     def payout(self):
         if self.player_folded:
@@ -130,7 +130,10 @@ class Game:
     def print_final_outcome(self):
         self.print_info("Final", "")
         print()
+        if self.create_log:
+            self.log_msg += f"\n"
 
+    # @profile
     def play_game(self, game):
         self.initial_setup(game)
 
@@ -148,6 +151,9 @@ class Game:
         if print_progress:
             print_step = self.games // print_portions
 
+        if self.create_log:
+            self.log_msg = ""
+
         for game in range(self.games):
             if print_progress:
                 if (game + 1) % print_step == 0:
@@ -160,6 +166,10 @@ class Game:
         if print_elapsed_time:
             end = time.time()
             print(f"{round(end - start, 2)}s")
+
+        if self.create_log:
+            with open(self.log_path, "w") as log_file:
+                log_file.write(self.log_msg)
 
     def print_results(self):
         for p in self.players:
