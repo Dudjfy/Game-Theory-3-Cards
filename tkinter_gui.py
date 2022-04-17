@@ -36,8 +36,8 @@ class TkinterGUI:
         self.og_size = size
         self.size = size
         self.root.geometry(str(self.size))
-        self.root.resizable(False, False)
-        self.root.option_add("*font", "arial 14")
+        # self.root.resizable(False, False)
+        self.root.option_add("*font", "arial 12")
 
         self.root.bind_all("<Button-1>", lambda event: event.widget.focus_set())
 
@@ -341,10 +341,19 @@ class PlayerSettingsFrame(NonMainFrame):
 
         self.variables = dict()
 
-        for y, name in enumerate(self.structured_data.data):
+        y = 1
+        for name, element in self.structured_data.data.items():
             label = Widget(Label(self.frame, text=name),
-                           Size(1, y + 1), rel_pos=RelPos())
+                           Size(1, y), rel_pos=RelPos())
             self.widgets.append(label)
+
+            y += 1
+            for name2, element2 in element.items():
+                label = Widget(Label(self.frame, text=name2),
+                               Size(1, y), rel_pos=RelPos())
+                self.widgets.append(label)
+
+                y += 1
 
             # setting_data = self.structured_data.data[name]
             # if isinstance(setting_data, float):

@@ -23,7 +23,7 @@ class DataHolder:
 
     def save(self):
         with open(self.path, "w") as json_file:
-            json.dump(self.data, json_file)
+            json.dump(self.data, json_file, indent=4)
 
     def print_whole_with_indents(self, indent=4):
         print(json.dumps(self.data, indent=indent))
@@ -264,8 +264,7 @@ class BluffingAIData(DataHolder):
                     "b": 1.0,
                 }
             }
-        },
-        "test": "test"
+        }
     }
 
     def __init__(self, path="bluffing_ai_data.txt"):

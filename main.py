@@ -1,4 +1,4 @@
-from data_structures import GameSettings
+from data_structures import GameSettings, BluffingAIData, SimpleAIData
 from game import Game
 from playable import SimpleAI, BluffingAI, Player, RandomAI
 from colorama import Fore, Back, Style
@@ -26,3 +26,18 @@ win.start()
 # gs.reset_to_default_data()
 # gs.save()
 
+# gs = BluffingAIData("bluffing_ai_data_1.txt")
+# gs.reset_to_default_data()
+# gs.save()
+#
+# gs = BluffingAIData("bluffing_ai_data_2.txt")
+# gs.reset_to_default_data()
+# gs.save()
+#
+# gs = SimpleAIData("simple_ai_data_1.txt")
+# gs.reset_to_default_data()
+# gs.save()
+#
+# gs = SimpleAIData("simple_ai_data_2.txt")
+# gs.reset_to_default_data()
+# gs.save()
