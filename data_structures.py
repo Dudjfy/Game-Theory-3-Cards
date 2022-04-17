@@ -193,9 +193,9 @@ class BluffingAIData(DataHolder):
         "dealer_first_move": {
             "one": {
                 "opponent_c": {
-                    "f": 0.0,
-                    "c": 1.0,
-                    "b": 0.0,
+                    "f": 0.666,
+                    "c": 0.0,
+                    "b": 0.333,
                 },
                 "opponent_b": {
                     "f": 1.0,
@@ -210,9 +210,9 @@ class BluffingAIData(DataHolder):
                     "b": 0.0,
                 },
                 "opponent_b": {
-                    "f": 1.0,
+                    "f": 0.666,
                     "c": 0.0,
-                    "b": 0.0,
+                    "b": 0.333,
                 }
             },
             "three": {
