@@ -10,7 +10,8 @@ logging.basicConfig(filename="log.log", level=logging.INFO, format="%(message)s"
 
 
 class Game:
-    def __init__(self, p1, p2, games=1, display_text=False, create_log=False, use_game_separators=True):
+    def __init__(self, p1, p2, games=1, display_text=False, create_log=False, use_game_separators=True,
+                 same_opener_and_dealer=False):
         self.break_loop = False
         self.games = games
         self.score_p1 = 0
@@ -28,6 +29,7 @@ class Game:
         self.display_text = display_text
         self.use_game_separators = use_game_separators
         self.create_log = create_log
+        self.same_opener_and_dealer = same_opener_and_dealer
 
     def reset_new_games(self):
         for p in self.players:
@@ -53,8 +55,12 @@ class Game:
         return self.pool
 
     def choose_opener_and_dealer(self, i):
-        self.opener = self.p1 if i % 2 == 0 else self.p2
-        self.dealer = self.p2 if i % 2 == 0 else self.p1
+        if not self.same_opener_and_dealer:
+            self.opener = self.p1 if i % 2 == 0 else self.p2
+            self.dealer = self.p2 if i % 2 == 0 else self.p1
+        else:
+            self.opener = self.p1
+            self.dealer = self.p2
 
         if self.display_text:
             print(f"Opener: {self.opener.text_color}{self.opener.name}{self.opener.default_color}, "

@@ -1,9 +1,10 @@
 {
-    "display_text": false,
+    "display_text": true,
     "create_log": false,
     "use_game_separator": true,
     "print_elapsed_time": true,
     "print_portions": 100,
     "print_progress": true,
-    "display_matplotlib_results": true
+    "display_matplotlib_results": true,
+    "same_opener_and_dealer": true
 }

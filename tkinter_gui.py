@@ -161,6 +161,7 @@ class MainFrame(FrameBase):
         self.game.display_text = variables["display_text"].get()
         self.game.create_log = variables["create_log"].get()
         self.game.use_game_separators = variables["use_game_separator"].get()
+        self.game.same_opener_and_dealer = variables["same_opener_and_dealer"].get()
         self.game.set_player(p1, p2)
 
         self.game.play_games(variables["print_elapsed_time"].get(),

@@ -59,10 +59,11 @@ class GameSettings(DataHolder):
         "display_text": False,
         "create_log": False,
         "use_game_separator": True,
-        "print_elapsed_time": False,
-        "print_portions": 1,
-        "print_progress": False,
+        "print_elapsed_time": True,
+        "print_portions": 100,
+        "print_progress": True,
         "display_matplotlib_results": True,
+        "same_opener_and_dealer": False,
     }
 
     def __init__(self, path="game_settings.txt"):
