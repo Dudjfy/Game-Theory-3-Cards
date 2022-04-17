@@ -3,7 +3,7 @@ from tkinter import ttk
 
 from data_structures import SimpleAiData
 from game import Game
-from playable import RandomAI
+from playable import RandomAI, Player
 
 
 class RelPos:
@@ -42,9 +42,11 @@ class TkinterGUI:
         self.pad = Size(5, 5)
         self.margin = Size(5, 10)
 
-        self.main_frame = MainFrame(self.root, self.size, self.pad, self.margin)
+        self.game = Game(RandomAI("Random AI 1"), RandomAI("Random AI 2"))
+        # self.game = Game(Player("P1"), Player("P2"))
+        self.game.set_display_text(True)
 
-        # self.game = Game(RandomAI("Random AI 1"), RandomAI("Random AI 2"))
+        self.main_frame = MainFrame(self.root, self.game, self.size, self.pad, self.margin)
 
     def start(self, load_main_frame=True):
         if load_main_frame:
@@ -54,13 +56,12 @@ class TkinterGUI:
 
     def load_main_frame(self):
         self.main_frame.load()
-        # self.main_frame_button.pack()
 
 
 class MainFrame:
     player_options = ["Simple AI", "Bluffing AI", "Human"]
 
-    def __init__(self, root, size, pad, margin):
+    def __init__(self, root, game, size, pad, margin):
         self.root = root
         self.og_size = size
         self.size = self.og_size
@@ -71,15 +72,18 @@ class MainFrame:
         root.bind("<Return>", lambda event: self.focus_out(event))
         root.bind("<Escape>", lambda event: self.focus_out(event))
 
-        self.widgets = []
+        self.games = IntVar(self.main_frame, value=1)
+        self.game = game
 
+        self.widgets = []
         self.add_widgets()
 
     def settings(self):
         print("settings")
 
     def run(self):
-        print("run")
+        self.game.set_games(self.games.get())
+        self.game.play_games()
 
     def load(self):
         self.main_frame.pack(fill="both", expand=1)
@@ -117,7 +121,6 @@ class MainFrame:
                                   Size(0, 0), rel_pos=RelPos(0.1, 0.15))
         self.widgets.append(self.games_label)
 
-        self.games = IntVar(self.main_frame, value=0)
         self.games_entry = Widget(Entry(self.main_frame, width=20, textvariable=self.games),
                                   Size(0, 1), rel_pos=RelPos(0.42, 0.15))
         self.widgets.append(self.games_entry)

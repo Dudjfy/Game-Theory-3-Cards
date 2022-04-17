@@ -28,6 +28,12 @@ class Game:
         self.use_game_separators = use_game_separators
         self.create_log = create_log
 
+    def set_display_text(self, display_text):
+        self.display_text = display_text
+
+    def set_games(self, games):
+        self.games = games
+
     def check_balance(self):
         return all([p.check_balance() for p in self.players])
 

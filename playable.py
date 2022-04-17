@@ -5,6 +5,7 @@ import numpy as np
 from betting import OpenerBetting, DealerBetting
 from colorama import Fore, Back, Style
 
+
 class Playable:
     options_normal = ["b", "c", "f"]
     options_on_bet = ["b", "f"]
@@ -104,17 +105,17 @@ class Player(Playable):
 
     def play_opener(self, opponent_choice):
         self.options = self.options_normal
-        self.play()
+        return self.play()
 
     def play_dealer(self, opponent_choice):
         self.options = self.options_normal
         if opponent_choice == "b":
             self.options = self.options_on_bet
-        self.play()
+        return self.play()
 
     def play_opener_choice_on_dealer_bet(self, opponent_choice):
         self.options = self.options_on_bet
-        self.play()
+        return self.play()
 
     def reset(self):
         if self.use_relative_balance:
