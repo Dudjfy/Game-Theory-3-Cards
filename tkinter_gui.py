@@ -297,6 +297,11 @@ class GameSettingsFrame(NonMainFrame):
 
         if change_label:
             self.saved_label.widget["text"] = "Saved!"
+            self.saved_label.widget["fg"] = "green"
+            self.root.update()
+            self.root.after(500)
+            self.saved_label.widget["fg"] = "black"
+
 
 
 
