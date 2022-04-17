@@ -120,18 +120,6 @@ class FrameBase:
 class MainFrame(FrameBase):
     player_options = ["Random AI", "Simple AI", "Bluffing AI", "Human"]
     players_with_data = ["Simple AI", "Bluffing AI"]
-    p1_options = {
-        "Random AI": RandomAI("Random AI 1"),
-        "Simple AI": SimpleAI("Simple AI 1", data_path="simple_ai_data_1.txt"),
-        "Bluffing AI": BluffingAI("Bluffing AI 1", data_path="bluffing_ai_data_1.txt"),
-        "Human": Player("Player 1"),
-    }
-    p2_options = {
-        "Random AI": RandomAI("Random AI 2"),
-        "Simple AI": SimpleAI("Simple AI 2", data_path="simple_ai_data_2.txt"),
-        "Bluffing AI": BluffingAI("Bluffing AI 2", data_path="bluffing_ai_data_2.txt"),
-        "Human": Player("Player 2"),
-    }
 
     def __init__(self, parent, root, size, pad, margin, game):
         super().__init__(parent, root, size, pad, margin)
@@ -204,7 +192,7 @@ class MainFrame(FrameBase):
 
         self.settings_player_1_button = Widget(Button(self.frame, text="Settings",
                                                       command=lambda: self.settings("player_1_settings_frame",
-                                                                                    self.game.p1)),
+                                                                                    self.game.p1), state=DISABLED),
                                                pos=Size(1, 1), rel_pos=RelPos(0.31, 0.3))
         self.widgets.append(self.settings_player_1_button)
 
@@ -220,7 +208,7 @@ class MainFrame(FrameBase):
 
         self.settings_player_2_button = Widget(Button(self.frame, text="Settings",
                                                       command=lambda: self.settings("player_2_settings_frame",
-                                                                                    self.game.p2)),
+                                                                                    self.game.p2), state=DISABLED),
                                                pos=Size(1, 1), rel_pos=RelPos(0.77, 0.3))
         self.widgets.append(self.settings_player_2_button)
 
@@ -257,9 +245,15 @@ class MainFrame(FrameBase):
 
     def options_menu_activated_1(self, *args):
         self.parent.player_1_settings_frame.change_player(self.player_1.get(), "p1")
+        self.settings_player_1_button.widget["state"] = DISABLED
+        if self.player_1.get() in self.players_with_data:
+            self.settings_player_1_button.widget["state"] = NORMAL
 
     def options_menu_activated_2(self, *args):
         self.parent.player_2_settings_frame.change_player(self.player_2.get(), "p2")
+        self.settings_player_2_button.widget["state"] = DISABLED
+        if self.player_2.get() in self.players_with_data:
+            self.settings_player_2_button.widget["state"] = NORMAL
 
 class NonMainFrame(FrameBase):
     def __init__(self, parent, root, size, pad, margin):
