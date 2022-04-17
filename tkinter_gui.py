@@ -30,10 +30,13 @@ class Widget:
 
 
 class TkinterGUI:
+    player_settings_options = ["player_1_settings_frame", "player_2_settings_frame"]
+
     def __init__(self, size=Size(800, 600)):
         self.root = Tk()
         self.root.title("Game Theory: One Card Poker")
         self.og_size = size
+        self.player_settings_size = Size(1660, 830)
         self.size = size
         self.root.geometry(str(self.size))
         # self.root.resizable(False, False)
@@ -74,6 +77,10 @@ class TkinterGUI:
 
     def load_frame_by_name(self, name):
         if name in self.frames:
+            self.root.geometry(str(self.og_size))
+            if name in self.player_settings_options:
+                self.root.geometry(str(self.player_settings_size))
+
             self.unload_frames()
             self.frames[name].load()
 
@@ -336,8 +343,8 @@ class PlayerSettingsFrame(NonMainFrame):
 
     def create_layout_from_data(self, show_values_in_labels=False):
         self.create_main_frame_button()
-        self.scrollbar = ttk.Scrollbar(self.frame, orient=VERTICAL)
-        self.scrollbar.place(relx=1, rely=0, relheight=1, anchor="ne")
+        # self.scrollbar = ttk.Scrollbar(self.frame, orient=VERTICAL)
+        # self.scrollbar.place(relx=1, rely=0, relheight=1, anchor="ne")
 
         self.variables = dict()
 
