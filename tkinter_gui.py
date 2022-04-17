@@ -127,7 +127,19 @@ class MainFrame(FrameBase):
 
     def run(self):
         self.game.set_games(self.games.get())
-        self.game.play_games()
+
+        variables = self.parent.game_settings_frame.variables
+
+        self.game.display_text = variables["display_text"].get()
+        self.game.create_log = variables["create_log"].get()
+        self.game.use_game_separators = variables["use_game_separator"].get()
+
+        self.game.play_games(variables["print_elapsed_time"].get(),
+                             variables["print_portions"].get(),
+                             variables["print_progress"].get())
+
+        if variables["display_matplotlib_results"].get():
+            self.game.display_matplotlib_results()
 
     def load(self):
         self.frame.pack(fill="both", expand=1)
