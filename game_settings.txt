@@ -1,6 +1,6 @@
 {
     "display_text": false,
-    "create_log": true,
+    "create_log": false,
     "use_game_separator": true,
     "print_elapsed_time": true,
     "print_portions": 100,

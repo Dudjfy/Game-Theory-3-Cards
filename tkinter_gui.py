@@ -37,7 +37,7 @@ class TkinterGUI:
         self.size = size
         self.root.geometry(str(self.size))
         # self.root.resizable(False, False)
-        self.root.option_add("*font", "arial 12")
+        self.root.option_add("*font", "arial 14")
 
         self.root.bind_all("<Button-1>", lambda event: event.widget.focus_set())
 
@@ -342,18 +342,55 @@ class PlayerSettingsFrame(NonMainFrame):
         self.variables = dict()
 
         y = 1
+        x = 1
         for name, element in self.structured_data.data.items():
             label = Widget(Label(self.frame, text=name),
-                           Size(1, y), rel_pos=RelPos())
+                           Size(x, y), rel_pos=RelPos())
             self.widgets.append(label)
 
             y += 1
-            for name2, element2 in element.items():
-                label = Widget(Label(self.frame, text=name2),
-                               Size(1, y), rel_pos=RelPos())
-                self.widgets.append(label)
+            if x > 1:
+                for name2, element2 in element.items():
+                    label = Widget(Label(self.frame, text=name2),
+                                   Size(x, y), rel_pos=RelPos())
+                    self.widgets.append(label)
 
-                y += 1
+                    y += 1
+                    for name3, element3 in element2.items():
+                        label = Widget(Label(self.frame, text=name3),
+                                       Size(x, y), rel_pos=RelPos())
+                        self.widgets.append(label)
+
+                        y += 1
+                        for name4, element4 in element3.items():
+                            label = Widget(Label(self.frame, text=name4),
+                                           Size(x, y), rel_pos=RelPos())
+                            self.widgets.append(label)
+                            entry = Widget(Entry(self.frame, text="1.00", width=4),
+                                           Size(x + 1, y), rel_pos=RelPos())
+                            self.widgets.append(entry)
+                            y += 1
+
+                    x += 2
+                    y = 2
+            else:
+                for name2, element2 in element.items():
+                    label = Widget(Label(self.frame, text=name2),
+                                   Size(x, y), rel_pos=RelPos())
+                    self.widgets.append(label)
+
+                    y += 1
+                    for name3, element3 in element2.items():
+                        label = Widget(Label(self.frame, text=name3),
+                                       Size(x, y), rel_pos=RelPos())
+                        self.widgets.append(label)
+                        entry = Widget(Entry(self.frame, text="1.00", width=4),
+                                       Size(x + 1, y), rel_pos=RelPos())
+                        self.widgets.append(entry)
+
+                        y += 1
+                x += 2
+            y = 1
 
             # setting_data = self.structured_data.data[name]
             # if isinstance(setting_data, float):
