@@ -36,6 +36,7 @@ class TkinterGUI:
         self.og_size = size
         self.size = size
         self.root.geometry(str(self.size))
+        self.root.resizable(False, False)
         self.root.option_add("*font", "arial 14")
 
         self.root.bind_all("<Button-1>", lambda event: event.widget.focus_set())
@@ -50,9 +51,9 @@ class TkinterGUI:
         self.main_frame = MainFrame(self, self.root, self.size, self.pad, self.margin, self.game)
         self.game_settings_frame = GameSettingsFrame(self, self.root, self.size, self.pad, self.margin)
         self.player_1_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad, self.margin,
-                                                           self.game.p1, "player_1_settings_frame")
+                                                           self.game.p1)
         self.player_2_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad, self.margin,
-                                                           self.game.p2, "player_2_settings_frame")
+                                                           self.game.p2)
 
         self.frames = {
             "main": self.main_frame,
@@ -116,9 +117,9 @@ class FrameBase:
         self.frame.focus_set()
         # print(games)
 
-    # def clear_frame(self):
-    #     for widget in self.frame.winfo_children():
-    #         widget.destroy()
+    def clear_frame(self):
+        for widget in self.frame.winfo_children():
+            widget.destroy()
 
 
 class MainFrame(FrameBase):
@@ -290,16 +291,16 @@ class PlayerSettingsFrame(NonMainFrame):
         "Human": Player("Player 2"),
     }
 
-    def __init__(self, parent, root, size, pad, margin, player, name):
+    def __init__(self, parent, root, size, pad, margin, player):
         super().__init__(parent, root, size, pad, margin)
-        self.name = name
         self.player = player
         self.structured_data = None
-        self.sub_frames = dict()
         self.construct_data()
 
         self.variables = dict()
 
+        # self.scrollbar = ttk.Scrollbar(self.frame, orient="vertical")
+        # self.scrollbar.grid(sticky="ns", columnspan=10)
         if self.structured_data is not None:
             self.create_layout_from_data()
 
@@ -333,39 +334,19 @@ class PlayerSettingsFrame(NonMainFrame):
                            Size(3, y + 1), rel_pos=RelPos())
             self.widgets.append(label)
 
-    def load_sub_frame_by_name(self, name):
-        if name in self.sub_frames:
-            self.unload_sub_frames()
-            self.sub_frames[name].load()
-
-    def unload_sub_frames(self):
-        for frame in self.sub_frames.values():
-            frame.frame.pack_forget()
-
-    def enter_sub_frame(self, name):
-        self.load_sub_frame_by_name(name)
-
     def create_layout_from_data(self, show_values_in_labels=False):
         self.create_main_frame_button()
+        self.scrollbar = ttk.Scrollbar(self.frame, orient=VERTICAL)
+        self.scrollbar.place(relx=1, rely=0, relheight=1, anchor="ne")
 
         self.variables = dict()
 
         for y, name in enumerate(self.structured_data.data):
-            label = Widget(Button(self.frame, text=name, command=lambda: self.enter_sub_frame(name)),
+            label = Widget(Label(self.frame, text=name),
                            Size(1, y + 1), rel_pos=RelPos())
             self.widgets.append(label)
 
-            self.sub_frames[name] = SubFrame(self, self.root, self.size, self.pad, self.margin,
-                                             self.player, name)
-
             # setting_data = self.structured_data.data[name]
-
-            # for y2, name2 in enumerate(setting_data):
-            #     label = Widget(Label(self.frame, text=name2),
-            #                    Size(1, y * 5 + 1 + y2), rel_pos=RelPos())
-            #     self.widgets.append(label)
-
-
             # if isinstance(setting_data, float):
             #     self.create_data_widget(setting_data, name, y, DoubleVar, Entry, show_values_in_labels)
             # elif isinstance(setting_data, bool):
@@ -387,6 +368,7 @@ class PlayerSettingsFrame(NonMainFrame):
 
     def change_player(self, player, player_list):
         self.player = self.p1_options[player] if player_list == "p1" else self.p2_options[player]
+        # print(self.player)
         self.construct_data()
 
     def construct_data(self):
@@ -394,85 +376,10 @@ class PlayerSettingsFrame(NonMainFrame):
             self.structured_data = None
         elif isinstance(self.player, SimpleAI) or isinstance(self.player, BluffingAI):
             self.structured_data = self.player.structured_data
-            self.sub_frames = dict()
+            # self.clear_frame()
             self.frame = Frame(self.root, width=self.size.x, height=self.size.y)
             self.create_layout_from_data()
-
-
-class SubFrame(PlayerSettingsFrame):
-    def __init__(self, parent, root, size, pad, margin, player, name):
-        super().__init__(parent, root, size, pad, margin, player, name)
-        self.construct_data()
-
-        self.variables = dict()
-
-        self.create_layout_from_data()
-
-        self.load_widgets_grid()
-
-    # def return_to_main(self):
-    #     self.save_data(change_label=False)
-    #     self.saved_label.widget["text"] = ""
-    #     self.parent.load_frame_by_name("main")
-
-    def create_data_widget(self, setting_data, name, y, variable_type, widget_type, show_values_in_labels=False):
-        self.variables[name] = variable_type(name=name, value=setting_data)
-        if isinstance(setting_data, bool):
-            field = Widget(widget_type(self.frame, width=1, height=1, variable=self.variables[name]),
-                           Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
-        else:
-            field = Widget(widget_type(self.frame, width=20, textvariable=self.variables[name]),
-                           Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
-        self.widgets.append(field)
-
-        if show_values_in_labels:
-            label = Widget(Label(self.frame, textvariable=self.variables[name]),
-                           Size(3, y + 1), rel_pos=RelPos())
-            self.widgets.append(label)
-
-    def create_layout_from_data(self, show_values_in_labels=False):
-        self.create_main_frame_button()
-        self.parent_button = Widget(Button(self.frame, text="Back",
-                                           command=lambda: self.parent.parent.load_frame_by_name(self.parent.name)),
-                                                  pos=Size(0, 1), rel_pos=RelPos(0.02, 0.05))
-        self.widgets.append(self.return_to_main_frame_button)
-
-        self.variables = dict()
-
-        for y, name in enumerate(self.parent.sturctured_data[self.name]):
-            label = Widget(Button(self.frame, text=name, command=self.enter_sub_frame),
-                           Size(1, y + 1), rel_pos=RelPos())
-            self.widgets.append(label)
-
-            # setting_data = self.structured_data.data[name]
-
-            # for y2, name2 in enumerate(setting_data):
-            #     label = Widget(Label(self.frame, text=name2),
-            #                    Size(1, y * 5 + 1 + y2), rel_pos=RelPos())
-            #     self.widgets.append(label)
-
-            # if isinstance(setting_data, float):
-            #     self.create_data_widget(setting_data, name, y, DoubleVar, Entry, show_values_in_labels)
-            # elif isinstance(setting_data, bool):
-            #     self.create_data_widget(setting_data, name, y, BooleanVar, Checkbutton, show_values_in_labels)
-            # elif isinstance(setting_data, int):
-            #     self.create_data_widget(setting_data, name, y, IntVar, Entry, show_values_in_labels)
-
-    def save_data(self, change_label=True):
-        for name, variable in self.variables.items():
-            self.structured_data.set_element_by_keys([name], variable.get())
-        self.structured_data.save()
-
-        if change_label:
-            self.saved_label.widget["text"] = "Saved!"
-            self.saved_label.widget["fg"] = "green"
-            self.root.update()
-            self.root.after(500)
-            self.saved_label.widget["fg"] = "black"
-
-    def construct_data(self):
-        self.frame = Frame(self.root, width=self.size.x, height=self.size.y)
-        self.create_layout_from_data()
+        # print(self.structured_data)
 
 
 class GameSettingsFrame(NonMainFrame):
