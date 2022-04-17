@@ -227,7 +227,7 @@ class MainFrame(FrameBase):
 
         self.settings_player_2_button = Widget(Button(self.frame, text="Settings",
                                                       command=lambda: self.settings("player_2_settings_frame",
-                                                                                    self.parent.player_1_settings_frame.player), state=DISABLED),
+                                                                                    self.parent.player_2_settings_frame.player), state=DISABLED),
                                                pos=Size(1, 1), rel_pos=RelPos(0.77, 0.3))
         self.widgets.append(self.settings_player_2_button)
 
