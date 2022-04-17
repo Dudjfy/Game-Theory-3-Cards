@@ -1,3 +1,4 @@
+import time
 from tkinter import *
 from tkinter import ttk
 
@@ -216,13 +217,17 @@ class GameSettingsFrame(NonMainFrame):
 
         self.save_button = Widget(Button(self.frame, text="Save",
                                          command=self.save_data),
-                                         pos=Size(4, 8), rel_pos=RelPos(0.02, 0.05))
+                                  pos=Size(4, 8), rel_pos=RelPos(0.02, 0.05))
         self.widgets.append(self.save_button)
+        self.saved_label = Widget(Label(self.frame, text=""),
+                                  pos=Size(5, 8), rel_pos=RelPos(0.02, 0.05))
+        self.widgets.append(self.saved_label)
 
         self.load_widgets_grid()
 
     def return_to_main(self):
-        self.save_data()
+        self.save_data(change_label=False)
+        self.saved_label.widget["text"] = ""
         self.parent.load_frame_by_name("main")
 
     def create_layout_from_data(self, show_values_in_labels=False):
@@ -267,8 +272,13 @@ class GameSettingsFrame(NonMainFrame):
             #                 Size(1, y + 1), rel_pos=RelPos())
             # self.widgets.append(widget)
 
-    def save_data(self):
+    def save_data(self, change_label=True):
         for name, variable in self.variables.items():
             self.data_structured.set_element_by_keys([name], variable.get())
         self.data_structured.save()
+
+        if change_label:
+            self.saved_label.widget["text"] = "Saved!"
+
+
 
