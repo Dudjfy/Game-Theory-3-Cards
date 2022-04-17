@@ -213,6 +213,12 @@ class GameSettingsFrame(NonMainFrame):
         self.variables = dict()
 
         self.create_layout_from_data()
+
+        self.save_button = Widget(Button(self.frame, text="Save",
+                                         command=self.save_data),
+                                         pos=Size(4, 8), rel_pos=RelPos(0.02, 0.05))
+        self.widgets.append(self.save_button)
+
         self.load_widgets_grid()
 
     def return_to_main(self):
