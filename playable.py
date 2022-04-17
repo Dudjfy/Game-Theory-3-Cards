@@ -5,6 +5,8 @@ import numpy as np
 from betting import OpenerBetting, DealerBetting
 from colorama import Fore, Back, Style
 
+from data_structures import SimpleAIData, BluffingAIData
+
 
 class Playable:
     options_normal = ["b", "c", "f"]
@@ -146,6 +148,12 @@ class RandomAI(Playable):
 
 
 class SimpleAI(Playable):
+    def __init__(self, name="No Name", initial_balance=10000, relative_balance=0, betting_amount=1,
+                 use_relative_balance=True, text_color="default", data_path="simple_ai_data.txt"):
+        super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance, text_color)
+
+        self.structured_data = SimpleAIData(data_path)
+
     def play_opener(self, opponent_choice=None):
         if self.card.value == 1:
             return "c"
@@ -176,8 +184,11 @@ class SimpleAI(Playable):
 
 class BluffingAI(Playable):
     def __init__(self, name="No Name", initial_balance=10000, relative_balance=0, betting_amount=1,
-                 use_relative_balance=True, text_color="default"):
+                 use_relative_balance=True, text_color="default", data_path="bluffing_ai_data.txt"):
         super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance, text_color)
+
+        self.structured_data = BluffingAIData(data_path)
+
         self.opener_betting = OpenerBetting()
         self.dealer_betting = DealerBetting()
 

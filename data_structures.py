@@ -69,7 +69,7 @@ class GameSettings(DataHolder):
         super().__init__(path)
 
 
-class SimpleAiData(DataHolder):
+class SimpleAIData(DataHolder):
     default_data = {
         "opener_first_move": {
             "one": {
@@ -167,4 +167,106 @@ class SimpleAiData(DataHolder):
     }
 
     def __init__(self, path="simple_ai_data.txt"):
+        super().__init__(path)
+
+
+class BluffingAIData(DataHolder):
+    default_data = {
+        "opener_first_move": {
+            "one": {
+                "f": 0.0,
+                "c": 1.0,
+                "b": 0.0,
+            },
+            "two": {
+                "f": 0.0,
+                "c": 1.0,
+                "b": 0.0,
+            },
+            "three": {
+                "f": 0.0,
+                "c": 0.0,
+                "b": 1.0,
+            }
+        },
+        "dealer_first_move": {
+            "one": {
+                "opponent_c": {
+                    "f": 0.0,
+                    "c": 1.0,
+                    "b": 0.0,
+                },
+                "opponent_b": {
+                    "f": 1.0,
+                    "c": 0.0,
+                    "b": 0.0,
+                }
+            },
+            "two": {
+                "opponent_c": {
+                    "f": 0.0,
+                    "c": 1.0,
+                    "b": 0.0,
+                },
+                "opponent_b": {
+                    "f": 1.0,
+                    "c": 0.0,
+                    "b": 0.0,
+                }
+            },
+            "three": {
+                "opponent_c": {
+                    "f": 0.0,
+                    "c": 0.0,
+                    "b": 1.0,
+                },
+                "opponent_b": {
+                    "f": 0.0,
+                    "c": 0.0,
+                    "b": 1.0,
+                }
+            }
+        },
+        "opener_second_move": {
+            "one": {
+                "opponent_c": {
+                    "f": 0.0,
+                    "c": 1.0,
+                    "b": 0.0,
+                },
+                "opponent_b": {
+                    "f": 1.0,
+                    "c": 0.0,
+                    "b": 0.0,
+                }
+            },
+            "two": {
+                "opponent_c": {
+                    "f": 0.0,
+                    "c": 1.0,
+                    "b": 0.0,
+                },
+                "opponent_b": {
+                    "f": 1.0,
+                    "c": 0.0,
+                    "b": 0.0,
+                }
+            },
+            "three": {
+                "opponent_c": {
+                    "f": 0.0,
+                    "c": 0.0,
+                    "b": 1.0,
+                },
+                "opponent_b": {
+                    "f": 0.0,
+                    "c": 0.0,
+                    "b": 1.0,
+                }
+            }
+        },
+        "test": "test"
+    }
+
+    def __init__(self, path="bluffing_ai_data.txt"):
         super().__init__(path)
