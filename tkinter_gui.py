@@ -49,10 +49,14 @@ class TkinterGUI:
 
         self.main_frame = MainFrame(self, self.root, self.size, self.pad, self.margin, self.game)
         self.game_settings_frame = GameSettingsFrame(self, self.root, self.size, self.pad, self.margin)
+        self.player_1_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad, self.margin)
+        self.player_2_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad, self.margin)
 
         self.frames = {
             "main": self.main_frame,
             "game_settings": self.game_settings_frame,
+            "player_1_settings_frame": self.player_1_settings_frame,
+            "player_2_settings_frame": self.player_2_settings_frame,
         }
 
     def start(self, load_main_frame=True):
@@ -134,8 +138,8 @@ class MainFrame(FrameBase):
 
         self.add_widgets()
 
-    def settings(self):
-        print("settings")
+    def settings(self, frame_name):
+        self.parent.load_frame_by_name(frame_name)
 
     def run(self):
         self.game.set_games(self.games.get())
@@ -193,7 +197,8 @@ class MainFrame(FrameBase):
                                            pos=Size(1, 0), rel_pos=RelPos(0.13, 0.3))
         self.widgets.append(self.player_1_option_menu)
 
-        self.settings_player_1_button = Widget(Button(self.frame, text="Settings", command=self.settings),
+        self.settings_player_1_button = Widget(Button(self.frame, text="Settings",
+                                                      command=lambda: self.settings("player_1_settings_frame")),
                                                pos=Size(1, 1), rel_pos=RelPos(0.31, 0.3))
         self.widgets.append(self.settings_player_1_button)
 
@@ -206,7 +211,8 @@ class MainFrame(FrameBase):
                                            pos=Size(1, 2), rel_pos=RelPos(0.59, 0.3))
         self.widgets.append(self.player_2_option_menu)
 
-        self.settings_player_2_button = Widget(Button(self.frame, text="Settings", command=self.settings),
+        self.settings_player_2_button = Widget(Button(self.frame, text="Settings",
+                                                      command=lambda: self.settings("player_2_settings_frame")),
                                                pos=Size(1, 1), rel_pos=RelPos(0.77, 0.3))
         self.widgets.append(self.settings_player_2_button)
 
@@ -253,6 +259,71 @@ class NonMainFrame(FrameBase):
 
     def return_to_main(self):
         self.parent.load_frame_by_name("main")
+
+
+class PlayerSettingsFrame(NonMainFrame):
+    def __init__(self, parent, root, size, pad, margin):
+        super().__init__(parent, root, size, pad, margin)
+        self.data_structured = SimpleAiData()
+        self.variables = dict()
+
+        self.create_layout_from_data()
+
+        # self.save_button = Widget(Button(self.frame, text="Save",
+        #                                  command=self.save_data),
+        #                           pos=Size(4, 8), rel_pos=RelPos(0.02, 0.05))
+        # self.widgets.append(self.save_button)
+        # self.saved_label = Widget(Label(self.frame, text=""),
+        #                           pos=Size(5, 8), rel_pos=RelPos(0.02, 0.05))
+        # self.widgets.append(self.saved_label)
+
+        self.load_widgets_grid()
+
+    # def return_to_main(self):
+    #     self.save_data(change_label=False)
+    #     self.saved_label.widget["text"] = ""
+    #     self.parent.load_frame_by_name("main")
+
+    def create_data_widget(self, setting_data, name, y, variable_type, widget_type, show_values_in_labels=False):
+        self.variables[name] = variable_type(name=name, value=setting_data)
+        if isinstance(setting_data, bool):
+            field = Widget(widget_type(self.frame, width=1, height=1, variable=self.variables[name]),
+                           Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
+        else:
+            field = Widget(widget_type(self.frame, width=20, textvariable=self.variables[name]),
+                           Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
+        self.widgets.append(field)
+
+        if show_values_in_labels:
+            label = Widget(Label(self.frame, textvariable=self.variables[name]),
+                           Size(3, y + 1), rel_pos=RelPos())
+            self.widgets.append(label)
+
+    def create_layout_from_data(self, show_values_in_labels=False):
+        for y, name in enumerate(self.data_structured.data):
+            label = Widget(Label(self.frame, text=name),
+                           Size(1, y + 1), rel_pos=RelPos())
+            self.widgets.append(label)
+
+            # setting_data = self.data_structured.data[name]
+            # if isinstance(setting_data, float):
+            #     self.create_data_widget(setting_data, name, y, DoubleVar, Entry, show_values_in_labels)
+            # elif isinstance(setting_data, bool):
+            #     self.create_data_widget(setting_data, name, y, BooleanVar, Checkbutton, show_values_in_labels)
+            # elif isinstance(setting_data, int):
+            #     self.create_data_widget(setting_data, name, y, IntVar, Entry, show_values_in_labels)
+
+    def save_data(self, change_label=True):
+        for name, variable in self.variables.items():
+            self.data_structured.set_element_by_keys([name], variable.get())
+        self.data_structured.save()
+
+        if change_label:
+            self.saved_label.widget["text"] = "Saved!"
+            self.saved_label.widget["fg"] = "green"
+            self.root.update()
+            self.root.after(500)
+            self.saved_label.widget["fg"] = "black"
 
 
 class GameSettingsFrame(NonMainFrame):
