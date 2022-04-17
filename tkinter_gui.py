@@ -207,12 +207,34 @@ class GameSettingsFrame(NonMainFrame):
     def __init__(self, parent, root, size, pad, margin):
         super().__init__(parent, root, size, pad, margin)
         self.data_structured = GameSettings()
+        self.variables = dict()
 
         self.create_layout_from_data()
         self.load_widgets_grid()
 
     def create_layout_from_data(self):
         for y, name in enumerate(self.data_structured.data):
-            widget = Widget(Label(self.frame, text=name),
-                            Size(1, y + 1), rel_pos=RelPos())
-            self.widgets.append(widget)
+            label = Widget(Label(self.frame, text=name),
+                           Size(1, y + 1), rel_pos=RelPos())
+            self.widgets.append(label)
+
+            setting_data = self.data_structured.data[name]
+            if isinstance(setting_data, float):
+                self.variables[name] = DoubleVar(name=name, value=setting_data)
+                field = Widget(Entry(self.frame, width=20, textvariable=self.variables[name]),
+                               Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
+                self.widgets.append(field)
+            elif isinstance(setting_data, bool):
+                self.variables[name] = BooleanVar(name=name, value=setting_data)
+                field = Widget(Entry(self.frame, width=20, textvariable=self.variables[name]),
+                               Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
+                self.widgets.append(field)
+            elif isinstance(setting_data, int):
+                self.variables[name] = IntVar(name=name, value=setting_data)
+                field = Widget(Entry(self.frame, width=20, textvariable=self.variables[name]),
+                               Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
+                self.widgets.append(field)
+
+            # widget = Widget(Label(self.frame, text=name),
+            #                 Size(1, y + 1), rel_pos=RelPos())
+            # self.widgets.append(widget)
