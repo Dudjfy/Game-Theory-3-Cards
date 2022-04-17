@@ -19,10 +19,10 @@ from tkinter_gui import TkinterGUI
 #
 # g.display_matplotlib_results()
 
-# win = TkinterGUI()
-# win.start()
+win = TkinterGUI()
+win.start()
 
-gs = GameSettings()
+# gs = GameSettings()
 # gs.reset_to_default_data()
 # gs.save()
 
