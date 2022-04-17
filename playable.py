@@ -3,27 +3,16 @@ import random
 import numpy as np
 
 from betting import OpenerBetting, DealerBetting
-
+from colorama import Fore, Back, Style
 
 class Playable:
     options_normal = ["b", "c", "f"]
     options_on_bet = ["b", "f"]
-    colors = {
-        "black": "\033[0;30;40m",
-        "red": "\033[0;31;40m",
-        "green": "\033[0;32;40m",
-        "yellow": "\033[0;33;40m",
-        "blue": "\033[0;34;40m",
-        "purple": "\033[0;35;40m",
-        "cyan": "\033[0;36;40m",
-        "white": "\033[0;37;40m",
-        "default": "\033[0;0m",
-    }
     default_color = "\033[0;0m"
 
     def __init__(self, name="No Name", initial_balance=10000, relative_balance=0, betting_amount=1,
-                 use_relative_balance=True, text_color="default"):
-        self.text_color = self.colors[text_color]
+                 use_relative_balance=True, text_color=Style.RESET_ALL):
+        self.text_color = text_color
         self.name = name
 
         self.card = None
@@ -36,8 +25,8 @@ class Playable:
         self.relative_balance = relative_balance
         self.use_relative_balance = use_relative_balance
 
-    def set_text_color(self, color="default"):
-        self.text_color = self.colors[color]
+    def set_text_color(self, new_color):
+        self.text_color = new_color
 
     def get_balance(self):
         if self.use_relative_balance:
