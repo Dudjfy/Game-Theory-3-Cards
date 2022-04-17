@@ -175,7 +175,8 @@ class Game:
 
         self.print_final_outcome()
 
-    def play_games(self, print_elapsed_time=False, print_portions=1, print_progress=False):
+    def play_games(self, print_elapsed_time=False, print_portions=1, print_progress=False,
+                   increase_progress_method=lambda: None):
         if print_elapsed_time:
             start = time.time()
 
@@ -185,7 +186,9 @@ class Game:
         for game in range(self.games):
             if print_progress:
                 if (game + 1) % print_step == 0:
-                    print(f"{(100 // print_portions) * ((game // print_step) + 1)}%")
+                    percentage = (100 // print_portions) * ((game // print_step) + 1)
+                    print(f"{percentage}%")
+                    increase_progress_method(percentage)
 
             if not self.check_balance():
                 break

@@ -117,7 +117,7 @@ class MainFrame(FrameBase):
     def __init__(self, parent, root, size, pad, margin, game):
         super().__init__(parent, root, size, pad, margin)
 
-        self.games = IntVar(self.frame, value=1)
+        self.games = IntVar(self.frame, value=100000)
         self.game = game
 
         self.add_widgets()
@@ -136,7 +136,8 @@ class MainFrame(FrameBase):
 
         self.game.play_games(variables["print_elapsed_time"].get(),
                              variables["print_portions"].get(),
-                             variables["print_progress"].get())
+                             variables["print_progress"].get(),
+                             lambda percentage: self.update_progress_bar(percentage))
 
         if variables["display_matplotlib_results"].get():
             self.game.display_matplotlib_results()
@@ -204,6 +205,11 @@ class MainFrame(FrameBase):
         self.progress_bar = Widget(ttk.Progressbar(self.frame, orient=HORIZONTAL, length=400, mode="determinate"),
                                    pos=Size(3, 1), rel_pos=RelPos(0.27, 0.8))
         self.widgets.append(self.progress_bar)
+
+    def update_progress_bar(self, percentage):
+        # self.root.update_idletasks()
+        self.root.update()
+        self.progress_bar.widget["value"] = percentage
 
 
 class NonMainFrame(FrameBase):
