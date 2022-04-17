@@ -4,7 +4,7 @@ from tkinter import ttk
 
 from data_structures import SimpleAiData, GameSettings
 from game import Game
-from playable import RandomAI, Player
+from playable import RandomAI, Player, SimpleAI, BluffingAI
 
 
 class RelPos:
@@ -112,7 +112,19 @@ class FrameBase:
 
 
 class MainFrame(FrameBase):
-    player_options = ["Simple AI", "Bluffing AI", "Human"]
+    player_options = ["Random AI", "Simple AI", "Bluffing AI", "Human"]
+    p1_options = {
+        "Random AI": RandomAI("Random AI 1"),
+        "Simple AI": SimpleAI("Simple AI 1"),
+        "Bluffing AI": BluffingAI("Bluffing AI 1"),
+        "Human": Player("Player 1"),
+    }
+    p2_options = {
+        "Random AI": RandomAI("Random AI 2"),
+        "Simple AI": SimpleAI("Simple AI 2"),
+        "Bluffing AI": BluffingAI("Bluffing AI 2"),
+        "Human": Player("Player 2"),
+    }
 
     def __init__(self, parent, root, size, pad, margin, game):
         super().__init__(parent, root, size, pad, margin)
@@ -130,10 +142,12 @@ class MainFrame(FrameBase):
         self.time_elapsed.set("")
 
         variables = self.parent.game_settings_frame.variables
+        p1, p2 = self.p1_options[self.player_1.get()], self.p2_options[self.player_2.get()]
 
         self.game.display_text = variables["display_text"].get()
         self.game.create_log = variables["create_log"].get()
         self.game.use_game_separators = variables["use_game_separator"].get()
+        self.game.set_player(p1, p2)
 
         self.game.play_games(variables["print_elapsed_time"].get(),
                              variables["print_portions"].get(),

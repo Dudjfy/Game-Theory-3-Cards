@@ -33,6 +33,10 @@ class Game:
         for p in self.players:
             p.reset()
 
+    def set_player(self, p1, p2):
+        self.p1, self.p2 = p1, p2
+        self.players = [self.p1, self.p2]
+
     def set_display_text(self, display_text):
         self.display_text = display_text
 
