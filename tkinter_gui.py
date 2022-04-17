@@ -43,7 +43,6 @@ class TkinterGUI:
         self.margin = Size(5, 10)
 
         self.game = Game(RandomAI("Random AI 1"), RandomAI("Random AI 2"))
-        self.game_settings_data = GameSettings()
         # self.game = Game(Player("P1"), Player("P2"))
         self.game.set_display_text(True)
 
@@ -86,11 +85,6 @@ class FrameBase:
 
         self.widgets = []
 
-        self.return_to_main_frame_button = Widget(Button(self.frame, text="Main",
-                                                         command=lambda: self.parent.load_frame_by_name("main")),
-                                                  pos=Size(0, 0), rel_pos=RelPos(0.02, 0.02))
-        self.widgets.append(self.return_to_main_frame_button)
-
     def load(self):
         self.frame.pack(fill="both", expand=1)
 
@@ -99,7 +93,7 @@ class FrameBase:
 
     def load_widgets_grid(self):
         for widget in self.widgets:
-            widget.widget.grid(row=widget.pos.x, column=widget.pos.y,
+            widget.widget.grid(row=widget.pos.y, column=widget.pos.x,
                                padx=self.margin.x, pady=self.margin.y, ipadx=self.pad.x, ipady=self.pad.y)
 
         # col_count, row_count = self.frame.grid_size()
@@ -125,7 +119,6 @@ class MainFrame(FrameBase):
         self.games = IntVar(self.frame, value=1)
         self.game = game
 
-        self.widgets = []
         self.add_widgets()
 
     def settings(self):
@@ -200,5 +193,26 @@ class MainFrame(FrameBase):
         self.widgets.append(self.progress_bar)
 
 
-class GameSettingsFrame(FrameBase):
-    pass
+class NonMainFrame(FrameBase):
+    def __init__(self, parent, root, size, pad, margin):
+        super().__init__(parent, root, size, pad, margin)
+
+        self.return_to_main_frame_button = Widget(Button(self.frame, text="Main",
+                                                         command=lambda: self.parent.load_frame_by_name("main")),
+                                                  pos=Size(0, 0), rel_pos=RelPos(0.02, 0.05))
+        self.widgets.append(self.return_to_main_frame_button)
+
+
+class GameSettingsFrame(NonMainFrame):
+    def __init__(self, parent, root, size, pad, margin):
+        super().__init__(parent, root, size, pad, margin)
+        self.data_structured = GameSettings()
+
+        self.create_layout_from_data()
+        self.load_widgets_grid()
+
+    def create_layout_from_data(self):
+        for y, name in enumerate(self.data_structured.data):
+            widget = Widget(Label(self.frame, text=name),
+                            Size(1, y + 1), rel_pos=RelPos())
+            self.widgets.append(widget)
