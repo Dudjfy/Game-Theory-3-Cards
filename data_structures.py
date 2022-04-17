@@ -63,7 +63,7 @@ class GameSettings(DataHolder):
         "print_portions": 100,
         "print_progress": True,
         "display_matplotlib_results": True,
-        "same_opener_and_dealer": False,
+        "same_opener_and_dealer": True,
     }
 
     def __init__(self, path="game_settings.txt"):
