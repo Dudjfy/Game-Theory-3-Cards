@@ -5,6 +5,7 @@ from tkinter import ttk
 from data_structures import SimpleAIData, GameSettings
 from game import Game
 from playable import RandomAI, Player, SimpleAI, BluffingAI
+from colorama import Fore, Back, Style
 
 
 class RelPos:
@@ -53,7 +54,7 @@ class TkinterGUI:
         self.pad = Size(5, 5)
         self.margin = Size(5, 10)
 
-        self.game = Game(RandomAI("Random AI 1"), RandomAI("Random AI 2"))
+        self.game = Game(RandomAI("Random AI 1", text_color=Fore.RED), RandomAI("Random AI 2", text_color=Fore.BLUE))
         # self.game = Game(Player("P1"), Player("P2"))
         self.game.set_display_text(True)
 
@@ -293,16 +294,16 @@ class NonMainFrame(FrameBase):
 
 class PlayerSettingsFrame(NonMainFrame):
     p1_options = {
-        "Random AI": RandomAI("Random AI 1"),
-        "Simple AI": SimpleAI("Simple AI 1", data_path="simple_ai_data_1.txt"),
-        "Bluffing AI": BluffingAI("Bluffing AI 1", data_path="bluffing_ai_data_1.txt"),
-        "Human": Player("Player 1"),
+        "Random AI": RandomAI("Random AI 1", text_color=Fore.RED),
+        "Simple AI": SimpleAI("Simple AI 1", data_path="simple_ai_data_1.txt", text_color=Fore.RED),
+        "Bluffing AI": BluffingAI("Bluffing AI 1", data_path="bluffing_ai_data_1.txt", text_color=Fore.RED),
+        "Human": Player("Player 1", text_color=Fore.RED),
     }
     p2_options = {
-        "Random AI": RandomAI("Random AI 2"),
-        "Simple AI": SimpleAI("Simple AI 2", data_path="simple_ai_data_2.txt"),
-        "Bluffing AI": BluffingAI("Bluffing AI 2", data_path="bluffing_ai_data_2.txt"),
-        "Human": Player("Player 2"),
+        "Random AI": RandomAI("Random AI 2", text_color=Fore.BLUE),
+        "Simple AI": SimpleAI("Simple AI 2", data_path="simple_ai_data_2.txt", text_color=Fore.BLUE),
+        "Bluffing AI": BluffingAI("Bluffing AI 2", data_path="bluffing_ai_data_2.txt", text_color=Fore.BLUE),
+        "Human": Player("Player 2", text_color=Fore.BLUE),
     }
 
     def __init__(self, parent, root, size, pad, margin, player):

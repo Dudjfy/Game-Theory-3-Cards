@@ -221,6 +221,7 @@ class Game:
             change_time_elapsed(time_elapsed)
 
     def display_matplotlib_results(self):
+        plt.clf()
         for p in self.players:
             plt.plot(p.balance_history, label=p.name)
         plt.legend()

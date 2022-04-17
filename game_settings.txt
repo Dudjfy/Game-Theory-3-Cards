@@ -1,5 +1,5 @@
 {
-    "display_text": true,
+    "display_text": false,
     "create_log": false,
     "use_game_separator": true,
     "print_elapsed_time": true,
