@@ -312,25 +312,17 @@ class PlayerSettingsFrame(NonMainFrame):
 
         self.variables = []
 
-        # self.scrollbar = ttk.Scrollbar(self.frame, orient="vertical")
-        # self.scrollbar.grid(sticky="ns", columnspan=10)
         if self.structured_data is not None:
             self.create_layout_from_data()
 
-        # self.save_button = Widget(Button(self.frame, text="Save",
-        #                                  command=self.save_data),
-        #                           pos=Size(4, 8), rel_pos=RelPos(0.02, 0.05))
-        # self.widgets.append(self.save_button)
-        # self.saved_label = Widget(Label(self.frame, text=""),
-        #                           pos=Size(5, 8), rel_pos=RelPos(0.02, 0.05))
-        # self.widgets.append(self.saved_label)
+        self.create_save_widgets()
 
         self.load_widgets_grid()
 
-    # def return_to_main(self):
-    #     self.save_data(change_label=False)
-    #     self.saved_label.widget["text"] = ""
-    #     self.parent.load_frame_by_name("main")
+    def return_to_main(self):
+        self.save_data(change_label=False)
+        self.saved_label.widget["text"] = ""
+        self.parent.load_frame_by_name("main")
 
     def create_data_widget(self, setting_data, names, x=0, y=0):
         self.variables.append(VariableStorage(names, DoubleVar(value=setting_data)))
@@ -340,8 +332,7 @@ class PlayerSettingsFrame(NonMainFrame):
 
     def create_layout_from_data(self, show_values_in_labels=False):
         self.create_main_frame_button()
-        # self.scrollbar = ttk.Scrollbar(self.frame, orient=VERTICAL)
-        # self.scrollbar.place(relx=1, rely=0, relheight=1, anchor="ne")
+        self.create_save_widgets()
 
         self.variables = []
 
@@ -414,8 +405,8 @@ class PlayerSettingsFrame(NonMainFrame):
             #     self.create_data_widget(setting_data, name, y, IntVar, Entry, show_values_in_labels)
 
     def save_data(self, change_label=True):
-        for name, variable in self.variables.items():
-            self.structured_data.set_element_by_keys([name], variable.get())
+        for var_storage in self.variables:
+            self.structured_data.set_element_by_keys(var_storage.names, var_storage.variable.get())
         self.structured_data.save()
 
         if change_label:
@@ -439,6 +430,15 @@ class PlayerSettingsFrame(NonMainFrame):
             self.frame = Frame(self.root, width=self.size.x, height=self.size.y)
             self.create_layout_from_data()
         # print(self.structured_data)
+
+    def create_save_widgets(self):
+        self.save_button = Widget(Button(self.frame, text="Save",
+                                         command=self.save_data),
+                                  pos=Size(13, 13), rel_pos=RelPos(0.02, 0.05))
+        self.widgets.append(self.save_button)
+        self.saved_label = Widget(Label(self.frame, text=""),
+                                  pos=Size(13, 12), rel_pos=RelPos(0.02, 0.05))
+        self.widgets.append(self.saved_label)
 
 
 class GameSettingsFrame(NonMainFrame):
