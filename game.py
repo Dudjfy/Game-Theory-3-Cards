@@ -204,7 +204,9 @@ class Game:
 
         if print_elapsed_time:
             end = time.time()
-            print(f"{round(end - start, 2)}s")
+            time_elapsed = round(end - start, 2)
+            print(f"{time_elapsed}s")
+            # change_time_elapsed(time_elapsed)
 
     def display_matplotlib_results(self):
         for p in self.players:

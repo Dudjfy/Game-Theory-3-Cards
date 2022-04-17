@@ -127,6 +127,7 @@ class MainFrame(FrameBase):
 
     def run(self):
         self.game.set_games(self.games.get())
+        self.time_elapsed.set("")
 
         variables = self.parent.game_settings_frame.variables
 
@@ -138,6 +139,7 @@ class MainFrame(FrameBase):
                              variables["print_portions"].get(),
                              variables["print_progress"].get(),
                              lambda percentage: self.update_progress_bar(percentage))
+                             # lambda time_elapsed: self.change_time_elapsed(time_elapsed))
 
         if variables["display_matplotlib_results"].get():
             self.game.display_matplotlib_results()
@@ -154,6 +156,7 @@ class MainFrame(FrameBase):
         self.add_third_row()
         self.add_fourth_row()
         self.add_fifth_row()
+        self.add_sixth_row()
 
     def add_first_row(self):
         self.games_label_text = "Amount of games simulated:"
@@ -212,6 +215,12 @@ class MainFrame(FrameBase):
                                    pos=Size(3, 1), rel_pos=RelPos(0.27, 0.8))
         self.widgets.append(self.progress_bar)
 
+    def add_sixth_row(self):
+        self.time_elapsed = StringVar(self.frame, value="")
+        self.progress_bar = Widget(Label(self.frame, textvariable=self.time_elapsed),
+                                   pos=Size(3, 1), rel_pos=RelPos(0.27, 0.7))
+        self.widgets.append(self.progress_bar)
+
     def update_progress_bar(self, percentage):
         # self.root.update_idletasks()
         self.root.update()
@@ -219,6 +228,9 @@ class MainFrame(FrameBase):
 
     def stop(self):
         self.game.break_loop = True
+
+    def change_time_elapsed(self, time_elapsed):
+        self.time_elapsed.set(time_elapsed)
 
 
 class NonMainFrame(FrameBase):
