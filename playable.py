@@ -156,22 +156,46 @@ class SimpleAI(Playable):
 
     def play_opener(self, opponent_choice=None):
         if self.card.value == 1:
-            return "c"
+            return random.choices(list(self.structured_data.data["opener_first_move"]["one"].keys()),
+                                  weights=self.structured_data.data["opener_first_move"]["one"].values(), k=1)
         elif self.card.value == 2:
-            return "c"
+            return random.choices(list(self.structured_data.data["opener_first_move"]["two"].keys()),
+                                  weights=self.structured_data.data["opener_first_move"]["two"].values(), k=1)
         elif self.card.value == 3:
-            return "b"
+            return random.choices(list(self.structured_data.data["opener_first_move"]["three"].keys()),
+                                  weights=self.structured_data.data["opener_first_move"]["three"].values(), k=1)
 
     def play_dealer(self, opponent_choice):
+        # rand = random.random()
         if self.card.value == 1:
-            return "f"
+            if opponent_choice == "c":
+                return random.choices(list(self.structured_data.data["dealer_first_move"]["one"]["opponent_c"].keys()),
+                                      weights=self.structured_data.data["dealer_first_move"]["one"][
+                                          "opponent_c"].values(), k=1)
+            elif opponent_choice == "b":
+                return random.choices(list(self.structured_data.data["dealer_first_move"]["one"]["opponent_b"].keys()),
+                                      weights=self.structured_data.data["dealer_first_move"]["one"][
+                                          "opponent_b"].values(), k=1)
         elif self.card.value == 2:
             if opponent_choice == "c":
-                return "c"
+                return random.choices(list(self.structured_data.data["dealer_first_move"]["two"]["opponent_c"].keys()),
+                                      weights=self.structured_data.data["dealer_first_move"]["two"][
+                                          "opponent_c"].values(), k=1)
             elif opponent_choice == "b":
-                return "f"
+                return random.choices(list(self.structured_data.data["dealer_first_move"]["two"]["opponent_b"].keys()),
+                                      weights=self.structured_data.data["dealer_first_move"]["two"][
+                                          "opponent_b"].values(), k=1)
         elif self.card.value == 3:
-            return "b"
+            if opponent_choice == "c":
+                return random.choices(
+                    list(self.structured_data.data["dealer_first_move"]["three"]["opponent_c"].keys()),
+                    weights=self.structured_data.data["dealer_first_move"]["three"][
+                        "opponent_c"].values(), k=1)
+            elif opponent_choice == "b":
+                return random.choices(
+                    list(self.structured_data.data["dealer_first_move"]["three"]["opponent_b"].keys()),
+                    weights=self.structured_data.data["dealer_first_move"]["three"][
+                        "opponent_b"].values(), k=1)
 
     def play_opener_choice_on_dealer_bet(self, opponent_choice):
         if self.card.value == 1:
@@ -189,28 +213,18 @@ class BluffingAI(Playable):
 
         self.structured_data = BluffingAIData(data_path)
 
-        # self.opener_betting = OpenerBetting()
-        # self.dealer_betting = DealerBetting()
-
     def play_opener(self, opponent_choice=None):
         if self.card.value == 1:
-            # print(self.structured_data.data["opener_first_move"]["one"].keys(),
-            #       self.structured_data.data["opener_first_move"]["one"].values())
             return random.choices(list(self.structured_data.data["opener_first_move"]["one"].keys()),
                                   weights=self.structured_data.data["opener_first_move"]["one"].values(), k=1)
         elif self.card.value == 2:
-            # print(self.structured_data.data["opener_first_move"]["two"].keys(),
-            #       self.structured_data.data["opener_first_move"]["two"].values())
             return random.choices(list(self.structured_data.data["opener_first_move"]["two"].keys()),
                                   weights=self.structured_data.data["opener_first_move"]["two"].values(), k=1)
         elif self.card.value == 3:
-            # print(self.structured_data.data["opener_first_move"]["three"].keys(),
-            #       self.structured_data.data["opener_first_move"]["three"].values())
             return random.choices(list(self.structured_data.data["opener_first_move"]["three"].keys()),
                                   weights=self.structured_data.data["opener_first_move"]["three"].values(), k=1)
 
     def play_dealer(self, opponent_choice):
-        # rand = random.random()
         if self.card.value == 1:
             if opponent_choice == "c":
                 return random.choices(list(self.structured_data.data["dealer_first_move"]["one"]["opponent_c"].keys()),
