@@ -43,8 +43,9 @@ class TkinterGUI:
         self.margin = Size(5, 10)
 
         self.game = Game(RandomAI("Random AI 1"), RandomAI("Random AI 2"))
+        self.game_settings = game_settings
         # self.game = Game(Player("P1"), Player("P2"))
-        self.game.set_display_text(True)
+        # self.game.set_display_text(True)
 
         self.main_frame = MainFrame(self.root, self.game, self.size, self.pad, self.margin)
 
