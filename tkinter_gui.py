@@ -248,6 +248,21 @@ class GameSettingsFrame(NonMainFrame):
         self.saved_label.widget["text"] = ""
         self.parent.load_frame_by_name("main")
 
+    def create_data_widget(self, setting_data, name, y, variable_type, widget_type, show_values_in_labels=False):
+        self.variables[name] = variable_type(name=name, value=setting_data)
+        if isinstance(setting_data, bool):
+            field = Widget(widget_type(self.frame, width=1, height=1, variable=self.variables[name]),
+                           Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
+        else:
+            field = Widget(widget_type(self.frame, width=20, textvariable=self.variables[name]),
+                           Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
+        self.widgets.append(field)
+
+        if show_values_in_labels:
+            label = Widget(Label(self.frame, textvariable=self.variables[name]),
+                           Size(3, y + 1), rel_pos=RelPos())
+            self.widgets.append(label)
+
     def create_layout_from_data(self, show_values_in_labels=False):
         for y, name in enumerate(self.data_structured.data):
             label = Widget(Label(self.frame, text=name),
@@ -256,39 +271,11 @@ class GameSettingsFrame(NonMainFrame):
 
             setting_data = self.data_structured.data[name]
             if isinstance(setting_data, float):
-                self.variables[name] = DoubleVar(name=name, value=setting_data)
-                field = Widget(Entry(self.frame, width=20, textvariable=self.variables[name]),
-                               Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
-                self.widgets.append(field)
-
-                if show_values_in_labels:
-                    label = Widget(Label(self.frame, textvariable=self.variables[name]),
-                                   Size(3, y + 1), rel_pos=RelPos())
-                    self.widgets.append(label)
+                self.create_data_widget(setting_data, name, y, DoubleVar, Entry, show_values_in_labels)
             elif isinstance(setting_data, bool):
-                self.variables[name] = BooleanVar(name=name, value=setting_data)
-                field = Widget(Checkbutton(self.frame, width=1, height=1, variable=self.variables[name]),
-                               Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
-                self.widgets.append(field)
-
-                if show_values_in_labels:
-                    label = Widget(Label(self.frame, textvariable=self.variables[name]),
-                                   Size(3, y + 1), rel_pos=RelPos())
-                    self.widgets.append(label)
+                self.create_data_widget(setting_data, name, y, BooleanVar, Checkbutton, show_values_in_labels)
             elif isinstance(setting_data, int):
-                self.variables[name] = IntVar(name=name, value=setting_data)
-                field = Widget(Entry(self.frame, width=20, textvariable=self.variables[name]),
-                               Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
-                self.widgets.append(field)
-
-                if show_values_in_labels:
-                    label = Widget(Label(self.frame, textvariable=self.variables[name]),
-                                   Size(3, y + 1), rel_pos=RelPos())
-                    self.widgets.append(label)
-
-            # widget = Widget(Label(self.frame, text=name),
-            #                 Size(1, y + 1), rel_pos=RelPos())
-            # self.widgets.append(widget)
+                self.create_data_widget(setting_data, name, y, IntVar, Entry, show_values_in_labels)
 
     def save_data(self, change_label=True):
         for name, variable in self.variables.items():
