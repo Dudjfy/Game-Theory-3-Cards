@@ -153,8 +153,8 @@ class Game:
         self.pay_winner(winner, message_beginning="got the larger card, won")
 
     def print_final_outcome(self):
+        self.print_info("Final", "")
         if self.display_text:
-            self.print_info("Final", "")
             print()
             if self.use_game_separators:
                 print("-" * 50)
