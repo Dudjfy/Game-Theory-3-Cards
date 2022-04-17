@@ -29,6 +29,12 @@ class Widget:
         self.rel_pos = rel_pos
 
 
+class VariableStorage:
+    def __init__(self, names, variable):
+        self.variable = variable
+        self.names = names
+
+
 class TkinterGUI:
     player_settings_options = ["player_1_settings_frame", "player_2_settings_frame"]
 
@@ -304,7 +310,7 @@ class PlayerSettingsFrame(NonMainFrame):
         self.structured_data = None
         self.construct_data()
 
-        self.variables = dict()
+        self.variables = []
 
         # self.scrollbar = ttk.Scrollbar(self.frame, orient="vertical")
         # self.scrollbar.grid(sticky="ns", columnspan=10)
@@ -326,27 +332,18 @@ class PlayerSettingsFrame(NonMainFrame):
     #     self.saved_label.widget["text"] = ""
     #     self.parent.load_frame_by_name("main")
 
-    def create_data_widget(self, setting_data, name, y, variable_type, widget_type, show_values_in_labels=False):
-        self.variables[name] = variable_type(name=name, value=setting_data)
-        if isinstance(setting_data, bool):
-            field = Widget(widget_type(self.frame, width=1, height=1, variable=self.variables[name]),
-                           Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
-        else:
-            field = Widget(widget_type(self.frame, width=20, textvariable=self.variables[name]),
-                           Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
+    def create_data_widget(self, setting_data, names, x=0, y=0):
+        self.variables.append(VariableStorage(names, DoubleVar(value=setting_data)))
+        field = Widget(Entry(self.frame, width=4, textvariable=self.variables[-1].variable),
+                       Size(x, y), rel_pos=RelPos())
         self.widgets.append(field)
-
-        if show_values_in_labels:
-            label = Widget(Label(self.frame, textvariable=self.variables[name]),
-                           Size(3, y + 1), rel_pos=RelPos())
-            self.widgets.append(label)
 
     def create_layout_from_data(self, show_values_in_labels=False):
         self.create_main_frame_button()
         # self.scrollbar = ttk.Scrollbar(self.frame, orient=VERTICAL)
         # self.scrollbar.place(relx=1, rely=0, relheight=1, anchor="ne")
 
-        self.variables = dict()
+        self.variables = []
 
         y = 1
         x = 1
@@ -373,9 +370,14 @@ class PlayerSettingsFrame(NonMainFrame):
                             label = Widget(Label(self.frame, text=name4),
                                            Size(x, y), rel_pos=RelPos())
                             self.widgets.append(label)
-                            entry = Widget(Entry(self.frame, text="1.00", width=4),
-                                           Size(x + 1, y), rel_pos=RelPos())
-                            self.widgets.append(entry)
+                            # entry = Widget(Entry(self.frame, text="1.00", width=4),
+                            #                Size(x + 1, y), rel_pos=RelPos())
+                            # self.widgets.append(entry)
+
+                            names = [name, name2, name3, name4]
+                            setting_data = self.structured_data.get_dict_element_by_keys_looping(names)
+                            self.create_data_widget(setting_data, names, x + 1, y)
+
                             y += 1
 
                     x += 2
@@ -391,9 +393,13 @@ class PlayerSettingsFrame(NonMainFrame):
                         label = Widget(Label(self.frame, text=name3),
                                        Size(x, y), rel_pos=RelPos())
                         self.widgets.append(label)
-                        entry = Widget(Entry(self.frame, text="1.00", width=4),
-                                       Size(x + 1, y), rel_pos=RelPos())
-                        self.widgets.append(entry)
+                        # entry = Widget(Entry(self.frame, text="1.00", width=4),
+                        #                Size(x + 1, y), rel_pos=RelPos())
+                        # self.widgets.append(entry)
+
+                        names = [name, name2, name3]
+                        setting_data = self.structured_data.get_dict_element_by_keys_looping(names)
+                        self.create_data_widget(setting_data, names, x + 1, y)
 
                         y += 1
                 x += 2
