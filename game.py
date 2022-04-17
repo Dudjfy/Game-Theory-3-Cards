@@ -11,6 +11,7 @@ logging.basicConfig(filename="log.log", level=logging.INFO, format="%(message)s"
 
 class Game:
     def __init__(self, p1, p2, games=1, display_text=False, create_log=False, use_game_separators=True):
+        self.break_loop = False
         self.games = games
         self.score_p1 = 0
         self.score_p2 = 0
@@ -27,6 +28,10 @@ class Game:
         self.display_text = display_text
         self.use_game_separators = use_game_separators
         self.create_log = create_log
+
+    def reset_new_games(self):
+        for p in self.players:
+            p.reset()
 
     def set_display_text(self, display_text):
         self.display_text = display_text
@@ -180,15 +185,18 @@ class Game:
         if print_elapsed_time:
             start = time.time()
 
-        if print_progress:
-            print_step = self.games // print_portions
+        print_step = self.games // print_portions
 
+        self.reset_new_games()
+        self.break_loop = False
         for game in range(self.games):
-            if print_progress:
-                if (game + 1) % print_step == 0:
-                    percentage = (100 // print_portions) * ((game // print_step) + 1)
+            if self.break_loop:
+                break
+            if (game + 1) % print_step == 0:
+                percentage = (100 // print_portions) * ((game // print_step) + 1)
+                increase_progress_method(percentage)
+                if print_progress:
                     print(f"{percentage}%")
-                    increase_progress_method(percentage)
 
             if not self.check_balance():
                 break

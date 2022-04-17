@@ -153,6 +153,7 @@ class MainFrame(FrameBase):
         self.add_second_row()
         self.add_third_row()
         self.add_fourth_row()
+        self.add_fifth_row()
 
     def add_first_row(self):
         self.games_label_text = "Amount of games simulated:"
@@ -202,6 +203,11 @@ class MainFrame(FrameBase):
         self.widgets.append(self.run)
 
     def add_fourth_row(self):
+        self.run = Widget(Button(self.frame, text="Stop", command=self.stop, width=6, height=1),
+                          pos=Size(2, 1), rel_pos=RelPos(0.475, 0.62))
+        self.widgets.append(self.run)
+
+    def add_fifth_row(self):
         self.progress_bar = Widget(ttk.Progressbar(self.frame, orient=HORIZONTAL, length=400, mode="determinate"),
                                    pos=Size(3, 1), rel_pos=RelPos(0.27, 0.8))
         self.widgets.append(self.progress_bar)
@@ -210,6 +216,9 @@ class MainFrame(FrameBase):
         # self.root.update_idletasks()
         self.root.update()
         self.progress_bar.widget["value"] = percentage
+
+    def stop(self):
+        self.game.break_loop = True
 
 
 class NonMainFrame(FrameBase):
