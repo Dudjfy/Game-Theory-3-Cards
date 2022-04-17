@@ -83,7 +83,7 @@ class FrameBase:
         self.root = root
         self.og_size = size
         self.size = self.og_size
-        self.frame = Frame(root, width=self.size.x, height=self.size.y)
+        self.frame = Frame(self.root, width=self.size.x, height=self.size.y)
         self.pad = pad
         self.margin = margin
 
@@ -102,7 +102,7 @@ class FrameBase:
         for widget in self.widgets:
             widget.widget.grid(row=widget.pos.y, column=widget.pos.x,
                                padx=self.margin.x, pady=self.margin.y, ipadx=self.pad.x, ipady=self.pad.y)
-
+        # print("placed")
         # col_count, row_count = self.frame.grid_size()
         #
         # for col in range(col_count):
@@ -371,7 +371,8 @@ class PlayerSettingsFrame(NonMainFrame):
             self.structured_data = None
         elif isinstance(self.player, SimpleAI) or isinstance(self.player, BluffingAI):
             self.structured_data = self.player.structured_data
-            self.clear_frame()
+            # self.clear_frame()
+            self.frame = Frame(self.root, width=self.size.x, height=self.size.y)
             self.create_layout_from_data()
         # print(self.structured_data)
 
