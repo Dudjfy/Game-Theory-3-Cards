@@ -138,8 +138,8 @@ class MainFrame(FrameBase):
         self.game.play_games(variables["print_elapsed_time"].get(),
                              variables["print_portions"].get(),
                              variables["print_progress"].get(),
-                             lambda percentage: self.update_progress_bar(percentage))
-                             # lambda time_elapsed: self.change_time_elapsed(time_elapsed))
+                             lambda percentage: self.update_progress_bar(percentage),
+                             lambda time_elapsed: self.change_time_elapsed(time_elapsed))
 
         if variables["display_matplotlib_results"].get():
             self.game.display_matplotlib_results()
@@ -167,10 +167,6 @@ class MainFrame(FrameBase):
         self.games_entry = Widget(Entry(self.frame, width=20, textvariable=self.games),
                                   Size(0, 1), rel_pos=RelPos(0.42, 0.15))
         self.widgets.append(self.games_entry)
-
-        # self.test_label = Widget(Label(self.frame, textvariable=self.games),
-        #                          Size(0, 2), rel_pos=RelPos(0.71, 0.15))
-        # self.widgets.append(self.test_label)
 
         self.settings_game_button = Widget(Button(self.frame, text="Game Settings",
                                                   command=lambda: self.parent.load_frame_by_name("game_settings")),
@@ -217,12 +213,11 @@ class MainFrame(FrameBase):
 
     def add_sixth_row(self):
         self.time_elapsed = StringVar(self.frame, value="")
-        self.progress_bar = Widget(Label(self.frame, textvariable=self.time_elapsed),
-                                   pos=Size(3, 1), rel_pos=RelPos(0.27, 0.7))
-        self.widgets.append(self.progress_bar)
+        self.time_elapsed_label = Widget(Label(self.frame, textvariable=self.time_elapsed),
+                                   pos=Size(3, 1), rel_pos=RelPos(0.49, 0.75))
+        self.widgets.append(self.time_elapsed_label)
 
     def update_progress_bar(self, percentage):
-        # self.root.update_idletasks()
         self.root.update()
         self.progress_bar.widget["value"] = percentage
 
@@ -230,7 +225,7 @@ class MainFrame(FrameBase):
         self.game.break_loop = True
 
     def change_time_elapsed(self, time_elapsed):
-        self.time_elapsed.set(time_elapsed)
+        self.time_elapsed.set(f"{time_elapsed}s")
 
 
 class NonMainFrame(FrameBase):

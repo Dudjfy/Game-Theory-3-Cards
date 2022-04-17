@@ -181,22 +181,24 @@ class Game:
         self.print_final_outcome()
 
     def play_games(self, print_elapsed_time=False, print_portions=1, print_progress=False,
-                   increase_progress_method=lambda: None):
+                   increase_progress_method=lambda: None, change_time_elapsed=lambda: None):
         if print_elapsed_time:
             start = time.time()
 
-        print_step = self.games // print_portions
+        if print_progress:
+            print_step = self.games // print_portions
 
         self.reset_new_games()
         self.break_loop = False
         for game in range(self.games):
             if self.break_loop:
                 break
-            if (game + 1) % print_step == 0:
-                percentage = (100 // print_portions) * ((game // print_step) + 1)
-                increase_progress_method(percentage)
-                if print_progress:
-                    print(f"{percentage}%")
+            if print_progress:
+                if (game + 1) % print_step == 0:
+                    percentage = (100 // print_portions) * ((game // print_step) + 1)
+                    increase_progress_method(percentage)
+                    if print_progress:
+                        print(f"{percentage}%")
 
             if not self.check_balance():
                 break
@@ -206,7 +208,7 @@ class Game:
             end = time.time()
             time_elapsed = round(end - start, 2)
             print(f"{time_elapsed}s")
-            # change_time_elapsed(time_elapsed)
+            change_time_elapsed(time_elapsed)
 
     def display_matplotlib_results(self):
         for p in self.players:
