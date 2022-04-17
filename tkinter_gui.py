@@ -116,6 +116,10 @@ class FrameBase:
         self.frame.focus_set()
         # print(games)
 
+    def clear_frame(self):
+        for widget in self.frame.winfo_children():
+            widget.destroy()
+
 
 class MainFrame(FrameBase):
     player_options = ["Random AI", "Simple AI", "Bluffing AI", "Human"]
@@ -192,7 +196,7 @@ class MainFrame(FrameBase):
 
         self.settings_player_1_button = Widget(Button(self.frame, text="Settings",
                                                       command=lambda: self.settings("player_1_settings_frame",
-                                                                                    self.game.p1), state=DISABLED),
+                                                                                    self.parent.player_1_settings_frame.player), state=DISABLED),
                                                pos=Size(1, 1), rel_pos=RelPos(0.31, 0.3))
         self.widgets.append(self.settings_player_1_button)
 
@@ -208,7 +212,7 @@ class MainFrame(FrameBase):
 
         self.settings_player_2_button = Widget(Button(self.frame, text="Settings",
                                                       command=lambda: self.settings("player_2_settings_frame",
-                                                                                    self.game.p2), state=DISABLED),
+                                                                                    self.parent.player_1_settings_frame.player), state=DISABLED),
                                                pos=Size(1, 1), rel_pos=RelPos(0.77, 0.3))
         self.widgets.append(self.settings_player_2_button)
 
@@ -255,10 +259,14 @@ class MainFrame(FrameBase):
         if self.player_2.get() in self.players_with_data:
             self.settings_player_2_button.widget["state"] = NORMAL
 
+
 class NonMainFrame(FrameBase):
     def __init__(self, parent, root, size, pad, margin):
         super().__init__(parent, root, size, pad, margin)
 
+        self.create_main_frame_button()
+
+    def create_main_frame_button(self):
         self.return_to_main_frame_button = Widget(Button(self.frame, text="Main",
                                                          command=self.return_to_main),
                                                   pos=Size(0, 0), rel_pos=RelPos(0.02, 0.05))
@@ -324,6 +332,8 @@ class PlayerSettingsFrame(NonMainFrame):
             self.widgets.append(label)
 
     def create_layout_from_data(self, show_values_in_labels=False):
+        self.create_main_frame_button()
+
         self.variables = dict()
 
         for y, name in enumerate(self.structured_data.data):
@@ -361,6 +371,8 @@ class PlayerSettingsFrame(NonMainFrame):
             self.structured_data = None
         elif isinstance(self.player, SimpleAI) or isinstance(self.player, BluffingAI):
             self.structured_data = self.player.structured_data
+            self.clear_frame()
+            self.create_layout_from_data()
         # print(self.structured_data)
 
 
