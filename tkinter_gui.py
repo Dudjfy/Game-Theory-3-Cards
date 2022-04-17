@@ -212,7 +212,7 @@ class GameSettingsFrame(NonMainFrame):
         self.create_layout_from_data()
         self.load_widgets_grid()
 
-    def create_layout_from_data(self):
+    def create_layout_from_data(self, show_values_in_labels=False):
         for y, name in enumerate(self.data_structured.data):
             label = Widget(Label(self.frame, text=name),
                            Size(1, y + 1), rel_pos=RelPos())
@@ -224,17 +224,33 @@ class GameSettingsFrame(NonMainFrame):
                 field = Widget(Entry(self.frame, width=20, textvariable=self.variables[name]),
                                Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
                 self.widgets.append(field)
+
+                if show_values_in_labels:
+                    label = Widget(Label(self.frame, textvariable=self.variables[name]),
+                                   Size(3, y + 1), rel_pos=RelPos())
+                    self.widgets.append(label)
             elif isinstance(setting_data, bool):
                 self.variables[name] = BooleanVar(name=name, value=setting_data)
-                field = Widget(Entry(self.frame, width=20, textvariable=self.variables[name]),
+                field = Widget(Checkbutton(self.frame, width=1, height=1, variable=self.variables[name]),
                                Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
                 self.widgets.append(field)
+
+                if show_values_in_labels:
+                    label = Widget(Label(self.frame, textvariable=self.variables[name]),
+                                   Size(3, y + 1), rel_pos=RelPos())
+                    self.widgets.append(label)
             elif isinstance(setting_data, int):
                 self.variables[name] = IntVar(name=name, value=setting_data)
                 field = Widget(Entry(self.frame, width=20, textvariable=self.variables[name]),
                                Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
                 self.widgets.append(field)
 
+                if show_values_in_labels:
+                    label = Widget(Label(self.frame, textvariable=self.variables[name]),
+                                   Size(3, y + 1), rel_pos=RelPos())
+                    self.widgets.append(label)
+
             # widget = Widget(Label(self.frame, text=name),
             #                 Size(1, y + 1), rel_pos=RelPos())
             # self.widgets.append(widget)
+
