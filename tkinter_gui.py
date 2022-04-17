@@ -198,9 +198,12 @@ class NonMainFrame(FrameBase):
         super().__init__(parent, root, size, pad, margin)
 
         self.return_to_main_frame_button = Widget(Button(self.frame, text="Main",
-                                                         command=lambda: self.parent.load_frame_by_name("main")),
+                                                         command=self.return_to_main),
                                                   pos=Size(0, 0), rel_pos=RelPos(0.02, 0.05))
         self.widgets.append(self.return_to_main_frame_button)
+
+    def return_to_main(self):
+        self.parent.load_frame_by_name("main")
 
 
 class GameSettingsFrame(NonMainFrame):
@@ -211,6 +214,10 @@ class GameSettingsFrame(NonMainFrame):
 
         self.create_layout_from_data()
         self.load_widgets_grid()
+
+    def return_to_main(self):
+        self.save_data()
+        self.parent.load_frame_by_name("main")
 
     def create_layout_from_data(self, show_values_in_labels=False):
         for y, name in enumerate(self.data_structured.data):
@@ -253,4 +260,9 @@ class GameSettingsFrame(NonMainFrame):
             # widget = Widget(Label(self.frame, text=name),
             #                 Size(1, y + 1), rel_pos=RelPos())
             # self.widgets.append(widget)
+
+    def save_data(self):
+        for name, variable in self.variables.items():
+            self.data_structured.set_element_by_keys([name], variable.get())
+        self.data_structured.save()
 
