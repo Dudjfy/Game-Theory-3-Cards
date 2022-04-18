@@ -54,8 +54,8 @@ class TkinterGUI:
         self.pad = Size(5, 5)
         self.margin = Size(5, 10)
 
-        self.game = Game(RandomAI("Random AI 1", text_color=Fore.RED), RandomAI("Random AI 2", text_color=Fore.BLUE))
-        # self.game = Game(Player("P1"), Player("P2"))
+        self.game = Game(SimpleAI("Simple AI 1", text_color=Fore.RED),
+                         BluffingAI("Bluffing AI 2", text_color=Fore.BLUE))
         self.game.set_display_text(True)
 
         self.main_frame = MainFrame(self, self.root, self.size, self.pad, self.margin, self.game)
@@ -111,25 +111,18 @@ class FrameBase:
         self.frame.pack(fill="both", expand=1)
 
         self.load_widgets_grid()
-        # self.load_widgets_place()
 
     def load_widgets_grid(self):
         for widget in self.widgets:
             widget.widget.grid(row=widget.pos.y, column=widget.pos.x,
                                padx=self.margin.x, pady=self.margin.y, ipadx=self.pad.x, ipady=self.pad.y)
-        # print("placed")
-        # col_count, row_count = self.frame.grid_size()
-        #
-        # for col in range(col_count):
-        #     self.frame.columnconfigure(col, weight=1)
 
     def load_widgets_place(self):
         for widget in self.widgets:
             widget.widget.place(relx=widget.rel_pos.x, rely=widget.rel_pos.y, anchor=W)
 
-    def focus_out(self, event, games=None):
+    def focus_out(self, event):
         self.frame.focus_set()
-        # print(games)
 
     def clear_frame(self):
         for widget in self.frame.winfo_children():
@@ -177,7 +170,6 @@ class MainFrame(FrameBase):
     def load(self):
         self.frame.pack(fill="both", expand=1)
 
-        # self.load_widgets_grid()
         self.load_widgets_place()
 
     def add_widgets(self):
@@ -204,7 +196,7 @@ class MainFrame(FrameBase):
         self.widgets.append(self.settings_game_button)
 
     def add_second_row(self):
-        self.player_1 = StringVar(self.frame, value="Random AI")
+        self.player_1 = StringVar(self.frame, value="Simple AI")
         self.player_1.trace("w", self.options_menu_activated_1)
         self.player_1_option_menu = Widget(OptionMenu(self.frame, self.player_1, *self.player_options),
                                            pos=Size(1, 0), rel_pos=RelPos(0.13, 0.3))
@@ -212,7 +204,7 @@ class MainFrame(FrameBase):
 
         self.settings_player_1_button = Widget(Button(self.frame, text="Settings",
                                                       command=lambda: self.settings("player_1_settings_frame",
-                                                                                    self.parent.player_1_settings_frame.player), state=DISABLED),
+                                                                                    self.parent.player_1_settings_frame.player), state=NORMAL),
                                                pos=Size(1, 1), rel_pos=RelPos(0.31, 0.3))
         self.widgets.append(self.settings_player_1_button)
 
@@ -220,7 +212,7 @@ class MainFrame(FrameBase):
                                Size(1, 1), rel_pos=RelPos(0.49, 0.3))
         self.widgets.append(self.vs_label)
 
-        self.player_2 = StringVar(self.frame, value="Random AI")
+        self.player_2 = StringVar(self.frame, value="Bluffing AI")
         self.player_2.trace("w", self.options_menu_activated_2)
         self.player_2_option_menu = Widget(OptionMenu(self.frame, self.player_2, *self.player_options),
                                            pos=Size(1, 2), rel_pos=RelPos(0.59, 0.3))
@@ -228,7 +220,7 @@ class MainFrame(FrameBase):
 
         self.settings_player_2_button = Widget(Button(self.frame, text="Settings",
                                                       command=lambda: self.settings("player_2_settings_frame",
-                                                                                    self.parent.player_2_settings_frame.player), state=DISABLED),
+                                                                                    self.parent.player_2_settings_frame.player), state=NORMAL),
                                                pos=Size(1, 1), rel_pos=RelPos(0.77, 0.3))
         self.widgets.append(self.settings_player_2_button)
 
@@ -363,9 +355,6 @@ class PlayerSettingsFrame(NonMainFrame):
                             label = Widget(Label(self.frame, text=name4),
                                            Size(x, y), rel_pos=RelPos())
                             self.widgets.append(label)
-                            # entry = Widget(Entry(self.frame, text="1.00", width=4),
-                            #                Size(x + 1, y), rel_pos=RelPos())
-                            # self.widgets.append(entry)
 
                             names = [name, name2, name3, name4]
                             setting_data = self.structured_data.get_dict_element_by_keys_looping(names)
@@ -386,9 +375,6 @@ class PlayerSettingsFrame(NonMainFrame):
                         label = Widget(Label(self.frame, text=name3),
                                        Size(x, y), rel_pos=RelPos())
                         self.widgets.append(label)
-                        # entry = Widget(Entry(self.frame, text="1.00", width=4),
-                        #                Size(x + 1, y), rel_pos=RelPos())
-                        # self.widgets.append(entry)
 
                         names = [name, name2, name3]
                         setting_data = self.structured_data.get_dict_element_by_keys_looping(names)
@@ -397,14 +383,6 @@ class PlayerSettingsFrame(NonMainFrame):
                         y += 1
                 x += 2
             y = 1
-
-            # setting_data = self.structured_data.data[name]
-            # if isinstance(setting_data, float):
-            #     self.create_data_widget(setting_data, name, y, DoubleVar, Entry, show_values_in_labels)
-            # elif isinstance(setting_data, bool):
-            #     self.create_data_widget(setting_data, name, y, BooleanVar, Checkbutton, show_values_in_labels)
-            # elif isinstance(setting_data, int):
-            #     self.create_data_widget(setting_data, name, y, IntVar, Entry, show_values_in_labels)
 
     def save_data(self, change_label=True):
         for var_storage in self.variables:
@@ -428,10 +406,8 @@ class PlayerSettingsFrame(NonMainFrame):
             self.structured_data = None
         elif isinstance(self.player, SimpleAI) or isinstance(self.player, BluffingAI):
             self.structured_data = self.player.structured_data
-            # self.clear_frame()
             self.frame = Frame(self.root, width=self.size.x, height=self.size.y)
             self.create_layout_from_data()
-        # print(self.structured_data)
 
     def create_save_widgets(self):
         self.save_button = Widget(Button(self.frame, text="Save",
@@ -506,7 +482,3 @@ class GameSettingsFrame(NonMainFrame):
             self.root.update()
             self.root.after(500)
             self.saved_label.widget["fg"] = "black"
-
-
-
-

@@ -1,8 +1,5 @@
 import random
 
-import numpy as np
-
-from betting import OpenerBetting, DealerBetting
 from colorama import Fore, Back, Style
 
 from data_structures import SimpleAIData, BluffingAIData

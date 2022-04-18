@@ -43,13 +43,12 @@ class DataHolder:
         return msg
 
     def print_element_by_keys(self, args):
-        # print(self.get_dict_element_by_keys_recursively(args))
         print(self.get_dict_element_by_keys_looping(args))
 
     def set_element_by_keys(self, args, new_value=None):
         data = self.data
         last_key = args[-1]
-        for k in args[:-1]:  # when assigning drill down to *second* last key
+        for k in args[:-1]:
             data = data[k]
         data[last_key] = new_value
 
