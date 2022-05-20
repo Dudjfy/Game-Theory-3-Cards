@@ -505,6 +505,7 @@ class NewsSearcherFrame(NonMainFrame):
         news_options.insert(0, "None")
 
         self.news_outlet = StringVar(self.frame, value="None")
+        self.news_outlet.trace("w", self.news_outlet_options_menu_activated)
         self.news_outlet_option_menu = Widget(OptionMenu(self.frame, self.news_outlet, *news_options),
                                            pos=Size(1, 0), rel_pos=RelPos(0.13, 0.3))
         self.widgets.append(self.news_outlet_option_menu)
@@ -517,3 +518,6 @@ class NewsSearcherFrame(NonMainFrame):
 
     def return_to_main(self):
         self.parent.load_frame_by_name("main")
+
+    def news_outlet_options_menu_activated(self, *args):
+        print("change")
