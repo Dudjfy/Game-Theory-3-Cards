@@ -230,9 +230,9 @@ class MainFrame(FrameBase):
         self.widgets.append(self.run)
 
     def add_fourth_row(self):
-        self.run = Widget(Button(self.frame, text="Stop", command=self.stop, width=6, height=1),
+        self.stop = Widget(Button(self.frame, text="Stop", command=self.stop, width=6, height=1),
                           pos=Size(2, 1), rel_pos=RelPos(0.475, 0.62))
-        self.widgets.append(self.run)
+        self.widgets.append(self.stop)
 
     def add_fifth_row(self):
         self.progress_bar = Widget(ttk.Progressbar(self.frame, orient=HORIZONTAL, length=400, mode="determinate"),
@@ -482,3 +482,19 @@ class GameSettingsFrame(NonMainFrame):
             self.root.update()
             self.root.after(500)
             self.saved_label.widget["fg"] = "black"
+
+
+class NewsSearcherFrame(NonMainFrame):
+    def __init__(self, parent, root, size, pad, margin):
+        super().__init__(parent, root, size, pad, margin)
+
+        self.create_main_frame_button()
+
+    def create_main_frame_button(self):
+        self.return_to_main_frame_button = Widget(Button(self.frame, text="Main",
+                                                         command=self.return_to_main),
+                                                  pos=Size(0, 0), rel_pos=RelPos(0.02, 0.05))
+        self.widgets.append(self.return_to_main_frame_button)
+
+    def return_to_main(self):
+        self.parent.load_frame_by_name("main")
