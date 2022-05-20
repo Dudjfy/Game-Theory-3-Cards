@@ -575,4 +575,9 @@ class NewsSearcherFrame(NonMainFrame):
         pass
 
     def search_articles(self):
-        print(self.news_outlet.get(), self.topic.get(), self.article_depth.get())
+        news_outlet = self.news_outlet.get().lower()
+        topic = self.topic.get().lower()
+
+        self.news_searcher.create_user_defined_articles(news_outlet, topic, self.article_depth.get())
+        self.news_searcher.print_user_defined_colection(
+            self.news_searcher.user_defined_topics_articles[news_outlet][topic], "articles", self.article_depth.get())
