@@ -523,23 +523,22 @@ class NewsSearcherFrame(NonMainFrame):
                                            pos=Size(1, 0), rel_pos=RelPos(0.49, 0.15))
         self.widgets.append(self.article_depth_option_menu)
 
+        self.search_button = Widget(Button(self.frame, text="Search Articles",
+                                                         command=self.search_articles),
+                                                  pos=Size(0, 0), rel_pos=RelPos(0.60, 0.15))
+        self.search_button.widget.configure(state="disabled")
+
+        self.widgets.append(self.search_button)
+
     def load(self):
         self.frame.pack(fill="both", expand=1)
 
         self.load_widgets_place()
 
-    def create_main_frame_button(self):
-        self.return_to_main_frame_button = Widget(Button(self.frame, text="Main",
-                                                         command=self.return_to_main),
-                                                  pos=Size(0, 0), rel_pos=RelPos(0.02, 0.05))
-        self.widgets.append(self.return_to_main_frame_button)
-
-    def return_to_main(self):
-        self.parent.load_frame_by_name("main")
-
     def news_outlet_options_menu_activated(self, *args):
         if self.news_outlet.get() == "None":
             self.topic_option_menu.widget.configure(state="disabled")
+            self.search_button.widget.configure(state="disabled")
         else:
             news_outlet = self.news_outlet.get().lower()
             self.news_searcher.create_user_defined_topics(news_outlet)
@@ -552,9 +551,13 @@ class NewsSearcherFrame(NonMainFrame):
                 menu.add_command(label=topic_cap, command=lambda t=topic_cap: self.topic.set(t))
 
             self.topic_option_menu.widget.configure(state="normal")
+            self.search_button.widget.configure(state="normal")
 
     def topic_options_menu_activated(self, *args):
         pass
 
     def article_depth_options_menu_activated(self, *args):
         pass
+
+    def search_articles(self):
+        print(self.news_outlet.get(), self.topic.get())
