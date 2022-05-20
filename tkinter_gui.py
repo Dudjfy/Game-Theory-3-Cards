@@ -507,8 +507,26 @@ class NewsSearcherFrame(NonMainFrame):
         self.news_outlet = StringVar(self.frame, value="None")
         self.news_outlet.trace("w", self.news_outlet_options_menu_activated)
         self.news_outlet_option_menu = Widget(OptionMenu(self.frame, self.news_outlet, *news_options),
-                                           pos=Size(1, 0), rel_pos=RelPos(0.13, 0.3))
+                                           pos=Size(1, 0), rel_pos=RelPos(0.1, 0.4))
         self.widgets.append(self.news_outlet_option_menu)
+
+        self.topic = StringVar(self.frame, value="None")
+        self.topic.trace("w", self.topic_options_menu_activated)
+        self.topic_option_menu = Widget(OptionMenu(self.frame, self.topic, "none"),
+                                           pos=Size(1, 0), rel_pos=RelPos(0.3, 0.4))
+        self.topic_option_menu.widget.configure(state="disabled")
+        self.widgets.append(self.topic_option_menu)
+
+        # self.news_outlet = StringVar(self.frame, value="None")
+        # self.news_outlet.trace("w", self.news_outlet_options_menu_activated)
+        # self.news_outlet_option_menu = Widget(OptionMenu(self.frame, self.news_outlet, *news_options),
+        #                                    pos=Size(1, 0), rel_pos=RelPos(0.13, 0.3))
+        # self.widgets.append(self.news_outlet_option_menu)
+
+    def load(self):
+        self.frame.pack(fill="both", expand=1)
+
+        self.load_widgets_place()
 
     def create_main_frame_button(self):
         self.return_to_main_frame_button = Widget(Button(self.frame, text="Main",
@@ -520,4 +538,10 @@ class NewsSearcherFrame(NonMainFrame):
         self.parent.load_frame_by_name("main")
 
     def news_outlet_options_menu_activated(self, *args):
-        print("change")
+        if self.news_outlet.get() == "None":
+            print("It's None")
+        else:
+            print("NOT NONE")
+
+    def topic_options_menu_activated(self):
+        pass
