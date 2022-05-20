@@ -1,6 +1,5 @@
 import requests as req
 from bs4 import BeautifulSoup
-from line_profiler_pycharm import profile
 
 
 class NewsSearcher:

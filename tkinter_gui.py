@@ -4,6 +4,7 @@ from tkinter import ttk
 
 from data_structures import SimpleAIData, GameSettings
 from game import Game
+from news_searcher import NewsSearcher
 from playable import RandomAI, Player, SimpleAI, BluffingAI
 from colorama import Fore, Back, Style
 
@@ -498,6 +499,15 @@ class NewsSearcherFrame(NonMainFrame):
         super().__init__(parent, root, size, pad, margin)
 
         self.create_main_frame_button()
+
+        self.news_searcher = NewsSearcher()
+        news_options = list(self.news_searcher.display_names.values())
+        news_options.insert(0, "None")
+
+        self.news_outlet = StringVar(self.frame, value="None")
+        self.news_outlet_option_menu = Widget(OptionMenu(self.frame, self.news_outlet, *news_options),
+                                           pos=Size(1, 0), rel_pos=RelPos(0.13, 0.3))
+        self.widgets.append(self.news_outlet_option_menu)
 
     def create_main_frame_button(self):
         self.return_to_main_frame_button = Widget(Button(self.frame, text="Main",
