@@ -507,21 +507,21 @@ class NewsSearcherFrame(NonMainFrame):
         self.news_outlet = StringVar(self.frame, value="None")
         self.news_outlet.trace("w", self.news_outlet_options_menu_activated)
         self.news_outlet_option_menu = Widget(OptionMenu(self.frame, self.news_outlet, *news_options),
-                                           pos=Size(1, 0), rel_pos=RelPos(0.1, 0.4))
+                                           pos=Size(1, 0), rel_pos=RelPos(0.1, 0.15))
         self.widgets.append(self.news_outlet_option_menu)
 
         self.topic = StringVar(self.frame, value="None")
         self.topic.trace("w", self.topic_options_menu_activated)
-        self.topic_option_menu = Widget(OptionMenu(self.frame, self.topic, "none"),
-                                           pos=Size(1, 0), rel_pos=RelPos(0.3, 0.4))
+        self.topic_option_menu = Widget(OptionMenu(self.frame, self.topic, self.topic.get()),
+                                           pos=Size(1, 0), rel_pos=RelPos(0.3, 0.15))
         self.topic_option_menu.widget.configure(state="disabled")
         self.widgets.append(self.topic_option_menu)
 
-        # self.news_outlet = StringVar(self.frame, value="None")
-        # self.news_outlet.trace("w", self.news_outlet_options_menu_activated)
-        # self.news_outlet_option_menu = Widget(OptionMenu(self.frame, self.news_outlet, *news_options),
-        #                                    pos=Size(1, 0), rel_pos=RelPos(0.13, 0.3))
-        # self.widgets.append(self.news_outlet_option_menu)
+        self.article_depth = IntVar(self.frame, value=3)
+        self.article_depth.trace("w", self.article_depth_options_menu_activated)
+        self.article_depth_option_menu = Widget(OptionMenu(self.frame, self.article_depth, *[1, 3, 5, 10]),
+                                           pos=Size(1, 0), rel_pos=RelPos(0.6, 0.15))
+        self.widgets.append(self.article_depth_option_menu)
 
     def load(self):
         self.frame.pack(fill="both", expand=1)
@@ -543,5 +543,8 @@ class NewsSearcherFrame(NonMainFrame):
         else:
             print("NOT NONE")
 
-    def topic_options_menu_activated(self):
+    def topic_options_menu_activated(self, *args):
+        pass
+
+    def article_depth_options_menu_activated(self, *args):
         pass
