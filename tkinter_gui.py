@@ -501,49 +501,19 @@ class NewsSearcherFrame(NonMainFrame):
         self.create_main_frame_button()
 
         self.news_searcher = NewsSearcher()
-        news_options = list(self.news_searcher.display_names.values())
-        news_options.insert(0, "None")
+        self.news_options = list(self.news_searcher.display_names.values())
+        self.news_options.insert(0, "None")
 
-        label_height = 0.16
-        option_menu_height = label_height + 0.07
+        self.label_height = 0.16
+        self.option_menu_height = self.label_height + 0.07
 
-        self.news_outlet_label = Widget(Label(self.frame, text="News Outlets"),
-                                  Size(0, 0), rel_pos=RelPos(0.08, label_height))
-        self.widgets.append(self.news_outlet_label)
+        self.add_widgets()
 
-        self.news_outlet = StringVar(self.frame, value="None")
-        self.news_outlet.trace("w", self.news_outlet_options_menu_activated)
-        self.news_outlet_option_menu = Widget(OptionMenu(self.frame, self.news_outlet, *news_options),
-                                           pos=Size(1, 0), rel_pos=RelPos(0.1, option_menu_height))
-        self.widgets.append(self.news_outlet_option_menu)
-
-        self.topics_label = Widget(Label(self.frame, text="Topics"),
-                                  Size(0, 0), rel_pos=RelPos(0.325, label_height))
-        self.widgets.append(self.topics_label)
-
-        self.topic = StringVar(self.frame, value="Nyheter")
-        self.topic.trace("w", self.topic_options_menu_activated)
-        self.topic_option_menu = Widget(OptionMenu(self.frame, self.topic, self.topic.get()),
-                                           pos=Size(1, 0), rel_pos=RelPos(0.3, option_menu_height))
-        self.topic_option_menu.widget.configure(state="disabled")
-        self.widgets.append(self.topic_option_menu)
-
-        self.article_depth_label = Widget(Label(self.frame, text="# of Articles"),
-                                  Size(0, 0), rel_pos=RelPos(0.45, label_height))
-        self.widgets.append(self.article_depth_label)
-
-        self.article_depth = IntVar(self.frame, value=3)
-        self.article_depth.trace("w", self.article_depth_options_menu_activated)
-        self.article_depth_option_menu = Widget(OptionMenu(self.frame, self.article_depth, *[1, 3, 5, 10]),
-                                           pos=Size(1, 0), rel_pos=RelPos(0.49, option_menu_height))
-        self.widgets.append(self.article_depth_option_menu)
-
-        self.search_button = Widget(Button(self.frame, text="Search Articles",
-                                                         command=self.search_articles),
-                                                  pos=Size(0, 0), rel_pos=RelPos(0.60, option_menu_height))
-        self.search_button.widget.configure(state="disabled")
-
-        self.widgets.append(self.search_button)
+    def add_widgets(self):
+        self.add_news_outlet()
+        self.add_topic()
+        self.add_article_depth()
+        self.add_search()
 
     def load(self):
         self.frame.pack(fill="both", expand=1)
@@ -581,3 +551,46 @@ class NewsSearcherFrame(NonMainFrame):
         self.news_searcher.create_user_defined_articles(news_outlet, topic, self.article_depth.get())
         self.news_searcher.print_user_defined_colection(
             self.news_searcher.user_defined_topics_articles[news_outlet][topic], "articles", self.article_depth.get())
+
+    def add_news_outlet(self):
+        self.news_outlet_label = Widget(Label(self.frame, text="News Outlets"),
+                                        Size(0, 0), rel_pos=RelPos(0.08, self.label_height))
+        self.widgets.append(self.news_outlet_label)
+
+        self.news_outlet = StringVar(self.frame, value="None")
+        self.news_outlet.trace("w", self.news_outlet_options_menu_activated)
+        self.news_outlet_option_menu = Widget(OptionMenu(self.frame, self.news_outlet, *self.news_options),
+                                              pos=Size(1, 0), rel_pos=RelPos(0.1, self.option_menu_height))
+        self.widgets.append(self.news_outlet_option_menu)
+
+    def add_topic(self):
+        self.topics_label = Widget(Label(self.frame, text="Topics"),
+                                   Size(0, 0), rel_pos=RelPos(0.325, self.label_height))
+        self.widgets.append(self.topics_label)
+
+        self.topic = StringVar(self.frame, value="Nyheter")
+        self.topic.trace("w", self.topic_options_menu_activated)
+        self.topic_option_menu = Widget(OptionMenu(self.frame, self.topic, self.topic.get()),
+                                        pos=Size(1, 0), rel_pos=RelPos(0.3, self.option_menu_height))
+        self.topic_option_menu.widget.configure(state="disabled")
+        self.widgets.append(self.topic_option_menu)
+
+    def add_article_depth(self):
+        self.article_depth_label = Widget(Label(self.frame, text="# of Articles"),
+                                          Size(0, 0), rel_pos=RelPos(0.45, self.label_height))
+        self.widgets.append(self.article_depth_label)
+
+        self.article_depth = IntVar(self.frame, value=3)
+        self.article_depth.trace("w", self.article_depth_options_menu_activated)
+        self.article_depth_option_menu = Widget(OptionMenu(self.frame, self.article_depth, *[1, 3, 5, 10]),
+                                                pos=Size(1, 0), rel_pos=RelPos(0.49, self.option_menu_height))
+        self.widgets.append(self.article_depth_option_menu)
+
+    def add_search(self):
+        self.search_button = Widget(Button(self.frame, text="Search Articles",
+                                           command=self.search_articles),
+                                    pos=Size(0, 0), rel_pos=RelPos(0.60, self.option_menu_height))
+        self.search_button.widget.configure(state="disabled")
+
+        self.widgets.append(self.search_button)
+
