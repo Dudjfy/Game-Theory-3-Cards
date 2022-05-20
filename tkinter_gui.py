@@ -64,12 +64,14 @@ class TkinterGUI:
                                                            self.game.p1)
         self.player_2_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad, self.margin,
                                                            self.game.p2)
+        self.news_searcher_frame = NewsSearcherFrame(self, self.root, self.size, self.pad, self.margin)
 
         self.frames = {
             "main": self.main_frame,
             "game_settings": self.game_settings_frame,
             "player_1_settings_frame": self.player_1_settings_frame,
             "player_2_settings_frame": self.player_2_settings_frame,
+            "news_searcher": self.news_searcher_frame
         }
 
     def start(self, load_main_frame=True):
@@ -179,6 +181,7 @@ class MainFrame(FrameBase):
         self.add_fourth_row()
         self.add_fifth_row()
         self.add_sixth_row()
+        self.add_seventh_row()
 
     def add_first_row(self):
         self.games_label_text = "Amount of games simulated:"
@@ -236,7 +239,7 @@ class MainFrame(FrameBase):
 
     def add_fifth_row(self):
         self.progress_bar = Widget(ttk.Progressbar(self.frame, orient=HORIZONTAL, length=400, mode="determinate"),
-                                   pos=Size(3, 1), rel_pos=RelPos(0.27, 0.8))
+                                   pos=Size(3, 1), rel_pos=RelPos(0.27, 0.80))
         self.widgets.append(self.progress_bar)
 
     def add_sixth_row(self):
@@ -244,6 +247,12 @@ class MainFrame(FrameBase):
         self.time_elapsed_label = Widget(Label(self.frame, textvariable=self.time_elapsed),
                                    pos=Size(3, 1), rel_pos=RelPos(0.49, 0.75))
         self.widgets.append(self.time_elapsed_label)
+
+    def add_seventh_row(self):
+        self.news_searcher_button = Widget(Button(self.frame, text="News Searcher",
+                                                      command=lambda: self.parent.load_frame_by_name("news_searcher")),
+                                               pos=Size(1, 1), rel_pos=RelPos(0.43, 0.92))
+        self.widgets.append(self.news_searcher_button)
 
     def update_progress_bar(self, percentage):
         self.root.update()
