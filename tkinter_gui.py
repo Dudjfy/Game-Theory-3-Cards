@@ -514,6 +514,7 @@ class NewsSearcherFrame(NonMainFrame):
         self.add_topic()
         self.add_article_depth()
         self.add_search()
+        self.add_article_labels()
 
     def load(self):
         self.frame.pack(fill="both", expand=1)
@@ -549,8 +550,11 @@ class NewsSearcherFrame(NonMainFrame):
         topic = self.topic.get().lower()
 
         self.news_searcher.create_user_defined_articles(news_outlet, topic, self.article_depth.get())
-        self.news_searcher.print_user_defined_colection(
-            self.news_searcher.user_defined_topics_articles[news_outlet][topic], "articles", self.article_depth.get())
+
+        for i, article_collection in enumerate(
+                self.news_searcher.user_defined_topics_articles[news_outlet][self.topic.get().lower()].items()):
+            article, link = article_collection
+            self.article_labels[i].widget["text"] = f"{article:<.80}..."
 
     def add_news_outlet(self):
         self.news_outlet_label = Widget(Label(self.frame, text="News Outlets"),
@@ -593,4 +597,14 @@ class NewsSearcherFrame(NonMainFrame):
         self.search_button.widget.configure(state="disabled")
 
         self.widgets.append(self.search_button)
+
+    def add_article_labels(self):
+        self.article_labels = []
+        start = 0.35
+        step = 0.06
+        for i in range(10):
+            article_label = Widget(Label(self.frame, text=f""),
+                                              Size(0, 0), rel_pos=RelPos(0.1, start + i * step))
+            self.article_labels.append(article_label)
+            self.widgets.append(article_label)
 
