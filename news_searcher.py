@@ -200,24 +200,12 @@ class NewsSearcher:
 
             return list(user_defined_topics)[num]
 
-    def user_choosing(self):
+    def user_choosing_by_input(self):
         news_outlet = self.choosing_news_outlet()
+        self.create_user_defined_topics(news_outlet)
 
-        self.user_defined_sources = {news_outlet: self.alternative_sources[news_outlet]}
-        self.user_defined_topics = {news_outlet: dict()}
-        self.find_topics(self.user_defined_sources, self.user_defined_topics)
-        self.user_defined_topics_filtered = {news_outlet: dict()}
-        self.find_general_topics(self.user_defined_topics, self.user_defined_topics_filtered)
-        self.transform_relative_links_to_absolute_topics(self.user_defined_topics_filtered)
         topic = self.choosing_general_topic(self.user_defined_topics_filtered[news_outlet])
-
-        self.user_defined_topics_filtered = {news_outlet:
-                                             {topic: self.user_defined_topics_filtered[news_outlet][topic]}}
-        self.user_defined_topics_articles = {news_outlet: {topic: dict()}}
-        self.find_articles(self.user_defined_topics_filtered, self.user_defined_topics_articles)
-        self.transform_relative_links_to_absolute_articles(self.user_defined_topics_articles)
-
-        self.print_user_defined_colection(self.user_defined_topics_articles[news_outlet][topic], "articles")
+        self.create_user_defined_articles(news_outlet, topic)
 
     def print_news_outlets(self):
         print("Choose one of the following news outlets:")
@@ -237,3 +225,20 @@ class NewsSearcher:
             topic, link = topic_collection
             print(f"\t{i + 1}. {topic.capitalize()} - {link}")
         print()
+
+    def create_user_defined_topics(self, news_outlet):
+        self.user_defined_sources = {news_outlet: self.alternative_sources[news_outlet]}
+        self.user_defined_topics = {news_outlet: dict()}
+        self.find_topics(self.user_defined_sources, self.user_defined_topics)
+        self.user_defined_topics_filtered = {news_outlet: dict()}
+        self.find_general_topics(self.user_defined_topics, self.user_defined_topics_filtered)
+        self.transform_relative_links_to_absolute_topics(self.user_defined_topics_filtered)
+
+    def create_user_defined_articles(self, news_outlet, topic):
+        self.user_defined_topics_filtered = {news_outlet:
+                                                 {topic: self.user_defined_topics_filtered[news_outlet][topic]}}
+        self.user_defined_topics_articles = {news_outlet: {topic: dict()}}
+        self.find_articles(self.user_defined_topics_filtered, self.user_defined_topics_articles)
+        self.transform_relative_links_to_absolute_articles(self.user_defined_topics_articles)
+
+        self.print_user_defined_colection(self.user_defined_topics_articles[news_outlet][topic], "articles")
