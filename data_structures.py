@@ -1,9 +1,13 @@
+"""Data structure classes"""
+
 import json
 from os.path import exists
 
 
 class DataHolder:
-    default_data = dict()
+    """Generic parent class for data holder with generic methods for data loading, saving,
+    extraction etc"""
+    default_data = {}
 
     def __init__(self, path="test.txt"):
         self.data = None
@@ -11,24 +15,29 @@ class DataHolder:
         self.load()
 
     def reset_to_default_data(self):
+        """Resets current data to default"""
         self.data = self.default_data
 
     def load(self):
+        """Loads data form file path"""
         if exists(self.path):
-            with open(self.path, "r") as json_file:
+            with open(self.path, "r", encoding="utf8") as json_file:
                 self.data = json.load(json_file)
         else:
             self.data = self.default_data
             self.save()
 
     def save(self):
-        with open(self.path, "w") as json_file:
+        """Saves data to file by path"""
+        with open(self.path, "w", encoding="utf8") as json_file:
             json.dump(self.data, json_file, indent=4)
 
     def print_whole_with_indents(self, indent=4):
+        """Prints whole json data with indents"""
         print(json.dumps(self.data, indent=indent))
 
     def get_dict_element_by_keys_recursively(self, args, msg=None):
+        """Returns dict elements by give list och keys recursively"""
         if len(args) <= 0:
             return msg
 
@@ -37,15 +46,18 @@ class DataHolder:
         return self.get_dict_element_by_keys_recursively(args[1:], msg=msg[args[0]])
 
     def get_dict_element_by_keys_looping(self, args):
+        """Returns dict elements by give list och keys by looping"""
         msg = self.data
         for arg in args:
             msg = msg[arg]
         return msg
 
     def print_element_by_keys(self, args):
+        """Prints element by given keys"""
         print(self.get_dict_element_by_keys_looping(args))
 
     def set_element_by_keys(self, args, new_value=None):
+        """Sets (inserts) element by keys"""
         data = self.data
         last_key = args[-1]
         for k in args[:-1]:
@@ -54,6 +66,7 @@ class DataHolder:
 
 
 class GameSettings(DataHolder):
+    """Game settings data structure holder"""
     default_data = {
         "display_text": False,
         "create_log": False,
@@ -70,6 +83,7 @@ class GameSettings(DataHolder):
 
 
 class SimpleAIData(DataHolder):
+    """Simple AI data structure holder"""
     default_data = {
         "opener_first_move": {
             "one": {
@@ -171,6 +185,7 @@ class SimpleAIData(DataHolder):
 
 
 class BluffingAIData(DataHolder):
+    """Bluffing AI data structure holder"""
     default_data = {
         "opener_first_move": {
             "one": {
