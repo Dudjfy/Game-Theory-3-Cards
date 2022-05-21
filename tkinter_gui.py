@@ -619,11 +619,9 @@ class NewsSearcherFrame(NonMainFrame):
 
     def topic_options_menu_activated(self, *args):
         """Changes widgets based on news topic menu option changes, right now unused"""
-        pass
 
     def article_depth_options_menu_activated(self, *args):
         """Changes widgets based on news article depth menu option changes, right now unused"""
-        pass
 
     def search_articles(self):
         """Searches articles and fills the labels"""
