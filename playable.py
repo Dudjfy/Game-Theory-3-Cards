@@ -1,11 +1,15 @@
-import random
+"""Playable player types module used to simulate players in One Card Poker games"""
 
-from colorama import Fore, Back, Style
+import random
+from abc import abstractmethod
+
+from colorama import Style
 
 from data_structures import SimpleAIData, BluffingAIData
 
 
 class Playable:
+    """A playable class base to simulate players"""
     options_normal = ["b", "c", "f"]
     options_on_bet = ["b", "f"]
     default_color = Style.RESET_ALL
@@ -26,19 +30,23 @@ class Playable:
         self.use_relative_balance = use_relative_balance
 
     def set_text_color(self, new_color):
+        """Sets the text color"""
         self.text_color = new_color
 
     def get_balance(self):
+        """Returns the balance"""
         if self.use_relative_balance:
             return self.relative_balance
         return self.balance
 
     def check_balance(self):
+        """Checks the balance, old feature mostly because of the new relative balance"""
         if self.use_relative_balance:
             return True
         return self.balance - self.betting_amount >= 0
 
     def bet(self):
+        """Makes player bets, returns the amount bet"""
         if self.use_relative_balance:
             self.relative_balance -= self.betting_amount
             return self.betting_amount
@@ -49,15 +57,18 @@ class Playable:
         return 0
 
     def win(self, amount):
+        """Increases the balance with the amount when the player wins"""
         if self.use_relative_balance:
             self.relative_balance += amount
         else:
             self.balance += amount
 
     def set_card(self, card):
+        """Sets card based on input"""
         self.card = card
 
     def reset(self):
+        """Resets the player to default values"""
         if self.use_relative_balance:
             self.relative_balance = 0
         else:
@@ -67,28 +78,35 @@ class Playable:
         self.balance_history = []
 
     def record_balance_change(self):
+        """Records balance changes"""
         if self.use_relative_balance:
             self.balance_history.append(self.relative_balance)
         else:
             self.balance_history.append(self.balance)
 
+    @abstractmethod
     def play(self):
-        pass
+        """Play method"""
 
+    @abstractmethod
     def play_opener(self, opponent_choice):
-        pass
+        """Plays opener moves"""
 
+    @abstractmethod
     def play_dealer(self, opponent_choice):
-        pass
+        """Plays dealer moves"""
 
+    @abstractmethod
     def play_opener_choice_on_dealer_bet(self, opponent_choice):
-        pass
+        """Plays opener moves again after the dealer's bet"""
 
 
 class Player(Playable):
+    """Human based player class, takes keyboard input in console"""
     def __init__(self, name="No Name", initial_balance=10000, relative_balance=0, betting_amount=1,
                  use_relative_balance=True, print_help=True, text_color=Style.RESET_ALL):
-        super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance, text_color)
+        super().__init__(name, initial_balance, relative_balance, betting_amount,
+                         use_relative_balance, text_color)
         self.print_help = print_help
 
     def play(self):
@@ -99,8 +117,7 @@ class Player(Playable):
             inp = input(">>> ").strip().lower()
             if inp in self.options:
                 return inp
-            else:
-                print("Invalid command!")
+            print("Invalid command!")
 
     def play_opener(self, opponent_choice):
         self.options = self.options_normal
@@ -128,83 +145,132 @@ class Player(Playable):
 
 
 class RandomAI(Playable):
+    """Random AI class, chooses moves randomly with the same distribution for all choices"""
+    def play(self):
+        pass
+
     def play_opener(self, opponent_choice=None):
         return random.choice(self.options_normal)
 
     def play_dealer(self, opponent_choice):
         if opponent_choice == "c":
             return random.choice(self.options_normal)
-        elif opponent_choice == "b":
+        if opponent_choice == "b":
             return random.choice(self.options_on_bet)
+
+        # Even though it shouldn't come here this could fix it for when fold needs to compare to bet
+        # (mainly done to please pylint)
+        return "b"
 
     def play_opener_choice_on_dealer_bet(self, opponent_choice):
         if opponent_choice == "c":
             return random.choice(self.options_normal)
-        elif opponent_choice == "b":
+        if opponent_choice == "b":
             return random.choice(self.options_on_bet)
+
+        # Even though it shouldn't come here this could fix it for when fold needs to compare to bet
+        # (mainly done to please pylint)
+        return "b"
 
 
 class SimpleAI(Playable):
+    """Simple AI class, decisions based on saved file data"""
     def __init__(self, name="No Name", initial_balance=10000, relative_balance=0, betting_amount=1,
-                 use_relative_balance=True, text_color=Style.RESET_ALL, data_path="simple_ai_data.txt"):
-        super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance, text_color)
+                 use_relative_balance=True, text_color=Style.RESET_ALL,
+                 data_path="simple_ai_data.txt"):
+        super().__init__(name, initial_balance, relative_balance, betting_amount,
+                         use_relative_balance, text_color)
 
         self.structured_data = SimpleAIData(data_path)
 
+    def play(self):
+        pass
+
     def opener_first_short(self, move, card):
+        """Short form of random choices for opener first moves"""
         return random.choices(list(self.structured_data.data[move][card].keys()),
                               weights=self.structured_data.data[move][card].values(), k=1)[0]
 
     def dealer_short(self, move, card, opponent_move):
+        """Short form of random choices for dealer"""
         return random.choices(list(self.structured_data.data[move][card][opponent_move].keys()),
-                              weights=self.structured_data.data[move][card][opponent_move].values(), k=1)[0]
+                    weights=self.structured_data.data[move][card][opponent_move].values(), k=1)[0]
 
     def play_opener(self, opponent_choice=None):
         if self.card.value == 1:
             return self.opener_first_short("opener_first_move", "one")
-        elif self.card.value == 2:
+        if self.card.value == 2:
             return self.opener_first_short("opener_first_move", "two")
-        elif self.card.value == 3:
-            return self.opener_first_short("opener_first_move", "three")
+        return self.opener_first_short("opener_first_move", "three")
 
     def play_dealer(self, opponent_choice):
         if self.card.value == 1:
             if opponent_choice == "c":
                 return self.dealer_short("dealer_first_move", "one", "opponent_c")
-            elif opponent_choice == "b":
+            if opponent_choice == "b":
                 return self.dealer_short("dealer_first_move", "one", "opponent_b")
-        elif self.card.value == 2:
+
+            # Even though it shouldn't come here this could fix it for when fold needs to compare
+            # to bet (mainly done to please pylint)
+            return "f"
+        if self.card.value == 2:
             if opponent_choice == "c":
                 return self.dealer_short("dealer_first_move", "two", "opponent_c")
-            elif opponent_choice == "b":
+            if opponent_choice == "b":
                 return self.dealer_short("dealer_first_move", "two", "opponent_b")
-        elif self.card.value == 3:
-            if opponent_choice == "c":
-                return self.dealer_short("dealer_first_move", "three", "opponent_c")
-            elif opponent_choice == "b":
-                return self.dealer_short("dealer_first_move", "three", "opponent_b")
+
+            # Even though it shouldn't come here this could fix it for when fold needs to compare
+            # to bet (mainly done to please pylint)
+            return "b"
+
+        if opponent_choice == "c":
+            return self.dealer_short("dealer_first_move", "three", "opponent_c")
+        if opponent_choice == "b":
+            return self.dealer_short("dealer_first_move", "three", "opponent_b")
+
+        # Even though it shouldn't come here this could fix it for when fold needs to compare
+        # to bet (mainly done to please pylint)
+        return "b"
 
     def play_opener_choice_on_dealer_bet(self, opponent_choice):
         if self.card.value == 1:
             if opponent_choice == "c":
                 return self.dealer_short("opener_second_move", "one", "opponent_c")
-            elif opponent_choice == "b":
+            if opponent_choice == "b":
                 return self.dealer_short("opener_second_move", "one", "opponent_b")
-        elif self.card.value == 2:
+
+            # Even though it shouldn't come here this could fix it for when fold needs to compare
+            # to bet (mainly done to please pylint)
+            return "f"
+        if self.card.value == 2:
             if opponent_choice == "c":
                 return self.dealer_short("opener_second_move", "two", "opponent_c")
-            elif opponent_choice == "b":
+            if opponent_choice == "b":
                 return self.dealer_short("opener_second_move", "two", "opponent_b")
-        elif self.card.value == 3:
-            if opponent_choice == "c":
-                return self.dealer_short("opener_second_move", "three", "opponent_c")
-            elif opponent_choice == "b":
-                return self.dealer_short("opener_second_move", "three", "opponent_b")
+
+            # Even though it shouldn't come here this could fix it for when fold needs to compare
+            # to bet (mainly done to please pylint)
+            return "b"
+
+        if opponent_choice == "c":
+            return self.dealer_short("opener_second_move", "three", "opponent_c")
+        if opponent_choice == "b":
+            return self.dealer_short("opener_second_move", "three", "opponent_b")
+
+        # Even though it shouldn't come here this could fix it for when fold needs to compare
+        # to bet (mainly done to please pylint)
+        return "b"
 
 
 class BluffingAI(SimpleAI):
-    def __init__(self, name="No Name", initial_balance=10000, relative_balance=0, betting_amount=1,
-                 use_relative_balance=True, text_color=Style.RESET_ALL, data_path="bluffing_ai_data.txt"):
-        super().__init__(name, initial_balance, relative_balance, betting_amount, use_relative_balance, text_color)
+    """Bluffing AI class, decisions based on saved file data, bluffs sometimes while
+    simple AI doesn't, which theoretically gives this one an advantage"""
+
+    def __init__(self, name="No Name", initial_balance=10000, relative_balance=0,
+                 betting_amount=1,
+                 use_relative_balance=True, text_color=Style.RESET_ALL,
+                 data_path="bluffing_ai_data.txt"):
+        super().__init__(name, initial_balance, relative_balance, betting_amount,
+                         use_relative_balance, text_color)
 
         self.structured_data = BluffingAIData(data_path)
