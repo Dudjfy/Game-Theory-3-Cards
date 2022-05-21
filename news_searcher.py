@@ -1,8 +1,12 @@
+"""A module for a news searcher program, compatible with both console and tkinter based systems"""
+
 import requests as req
 from bs4 import BeautifulSoup
 
 
 class NewsSearcher:
+    """A News Searcher class. Main purpose is to search news, find topics and articles in those"""
+
     sources = {
         "expressen": "https://www.expressen.se/",
         "svt": "https://www.svt.se/",
@@ -16,34 +20,34 @@ class NewsSearcher:
         "dn": "https://www.dn.se/",
     }
     topics = {
-        "expressen": dict(),
-        "svt": dict(),
-        "aftonbladet": dict(),
-        "dn": dict(),
+        "expressen": {},
+        "svt": {},
+        "aftonbladet": {},
+        "dn": {},
     }
     common_topics = {
-        "expressen": dict(),
-        "svt": dict(),
-        "aftonbladet": dict(),
-        "dn": dict(),
+        "expressen": {},
+        "svt": {},
+        "aftonbladet": {},
+        "dn": {},
     }
     general_topics = {
-        "expressen": dict(),
-        "svt": dict(),
-        "aftonbladet": dict(),
-        "dn": dict(),
+        "expressen": {},
+        "svt": {},
+        "aftonbladet": {},
+        "dn": {},
     }
     common_topics_articles = {
-        "expressen": dict(),
-        "svt": dict(),
-        "aftonbladet": dict(),
-        "dn": dict(),
+        "expressen": {},
+        "svt": {},
+        "aftonbladet": {},
+        "dn": {},
     }
     general_topics_articles = {
-        "expressen": dict(),
-        "svt": dict(),
-        "aftonbladet": dict(),
-        "dn": dict(),
+        "expressen": {},
+        "svt": {},
+        "aftonbladet": {},
+        "dn": {},
     }
     display_names = {
         "expressen": "Expressen",
@@ -62,13 +66,15 @@ class NewsSearcher:
                                "världen",
                                "vetenskap",
                                "ledare"]
-    user_defined_sources = dict()
-    user_defined_topics = dict()
-    user_defined_topics_filtered = dict()
-    user_defined_topics_filtered_one_topic = dict()
-    user_defined_topics_articles = dict()
+    user_defined_sources = {}
+    user_defined_topics = {}
+    user_defined_topics_filtered = {}
+    user_defined_topics_filtered_one_topic = {}
+    user_defined_topics_articles = {}
 
-    def find_topics(self, sources, output_collection):
+    @staticmethod
+    def find_topics(sources, output_collection):
+        """A static method which finds all topics for all news outlets based on input sources"""
         for news_outlet, website in sources.items():
             url = req.get(website)
             soup = BeautifulSoup(url.text, "html.parser")
@@ -78,7 +84,8 @@ class NewsSearcher:
                     output_collection[news_outlet][a_tag.string.lower().strip()] = a_tag["href"]
 
     def find_common_topics(self):
-        for topic, link in self.topics["expressen"].items():
+        """Finds topics in common for different news outlets"""
+        for topic in self.topics["expressen"]:
             if topic not in self.topics["svt"]:
                 continue
             if topic not in self.topics["aftonbladet"]:
@@ -86,23 +93,27 @@ class NewsSearcher:
             if topic not in self.topics["dn"]:
                 continue
 
-            for news_outlet, topic_collection in self.common_topics.items():
-                self.common_topics[news_outlet][topic] = self.topics[news_outlet][topic]
+            for news_outlet, common_topic in self.common_topics.items():
+                common_topic[topic] = self.topics[news_outlet][topic]
 
     def transform_relative_links_to_absolute_topics(self, collection):
+        """Transforms relative links to absolute for topics"""
         for news_outlet, topic_collection in collection.items():
             for topic, link in topic_collection.items():
                 if "https://" not in link:
                     collection[news_outlet][topic] = f"{self.sources[news_outlet][:-1]}{link}"
 
     def transform_relative_links_to_absolute_articles(self, collection):
+        """Transforms relative links to absolute for articles"""
         for news_outlet, topic_collection in collection.items():
             for topic, articles in topic_collection.items():
                 for article, link in articles.items():
                     if "https://" not in link:
-                        collection[news_outlet][topic][article] = f"{self.sources[news_outlet][:-1]}{link}"
+                        collection[news_outlet][topic][article] = \
+                            f"{self.sources[news_outlet][:-1]}{link}"
 
     def create_common_topics(self):
+        """Creates common topics collections for all news outlets in multiple steps"""
         if len(self.topics["expressen"]) == 0:
             self.find_topics(self.alternative_sources, self.topics)
         self.find_common_topics()
@@ -112,6 +123,8 @@ class NewsSearcher:
         self.transform_relative_links_to_absolute_articles(self.common_topics_articles)
 
     def create_general_topics(self):
+        """Creates general topics collections for all news outlets in multiple steps,
+        based on predetermined wanted topics collection"""
         if len(self.topics["expressen"]) == 0:
             self.find_topics(self.alternative_sources, self.topics)
         self.find_general_topics(self.topics, self.general_topics)
@@ -121,12 +134,14 @@ class NewsSearcher:
         self.transform_relative_links_to_absolute_articles(self.general_topics_articles)
 
     def find_general_topics(self, input_collection, output_collection):
+        """Finds general topics for all news outlets"""
         for news_outlet, topic_collection in input_collection.items():
-            for topic, link in topic_collection.items():
+            for topic in topic_collection:
                 if topic in self.general_topics_examples:
                     output_collection[news_outlet][topic] = input_collection[news_outlet][topic]
 
     def display_topics(self, collection, article_collection, article_depth=3):
+        """Displays topics based on input collection and article search depth"""
         for news_outlet, topic_collection in collection.items():
             print(f"{self.display_names[news_outlet]}:")
             for topic, link in topic_collection.items():
@@ -143,16 +158,19 @@ class NewsSearcher:
             print()
 
     def find_articles(self, collection, articles_collection, article_depth=100):
+        """Finds articles in the given topics collections. Can be adjusted to work faster with
+        shallower search depth"""
         depth = 0
         for news_outlet, topic_collection in collection.items():
             for topic, link in topic_collection.items():
                 url = req.get(link)
                 soup = BeautifulSoup(url.text, "html.parser")
 
-                articles_collection[news_outlet][topic] = dict()
+                articles_collection[news_outlet][topic] = {}
                 for article_tag in soup.find_all("article"):
                     if article_tag.a.has_attr("href") and article_tag.a.has_attr("title"):
-                        articles_collection[news_outlet][topic][article_tag.a["title"]] = article_tag.a["href"]
+                        articles_collection[news_outlet][topic][article_tag.a["title"]] = \
+                            article_tag.a["href"]
 
                         depth += 1
                         if depth >= article_depth:
@@ -166,17 +184,19 @@ class NewsSearcher:
                             and isinstance(headers[0].string, str) \
                             and (a_tag["href"] not in self.sources.values()) \
                             and a_tag["href"] != "/":
-                        articles_collection[news_outlet][topic][headers[0].string.strip()] = a_tag["href"]
+                        articles_collection[news_outlet][topic][headers[0].string.strip()] = \
+                            a_tag["href"]
 
                         depth += 1
                         if depth >= article_depth:
                             return
 
     def choosing_news_outlet(self):
+        """Chooses news outlets based on user input"""
         while True:
             self.print_news_outlets()
 
-            num = input(f">>> ")
+            num = input(">>> ")
             print()
 
             if not num.isnumeric():
@@ -185,7 +205,7 @@ class NewsSearcher:
                 continue
 
             num = int(num) - 1
-            if not (0 <= num < len(self.sources)):
+            if not 0 <= num < len(self.sources):
                 print(f"Wrong news outlet! Please type a number from 1-{len(self.sources)}")
                 print()
                 continue
@@ -193,10 +213,12 @@ class NewsSearcher:
             return list(self.sources)[num]
 
     def choosing_general_topic(self, user_defined_topics):
+        """Chooses topics based on user input"""
         while True:
-            self.print_user_defined_colection(user_defined_topics, "topics", len(user_defined_topics))
+            self.print_user_defined_collection(user_defined_topics, "topics",
+                                               len(user_defined_topics))
 
-            num = input(f">>> ")
+            num = input(">>> ")
             print()
 
             if not num.isnumeric():
@@ -205,7 +227,7 @@ class NewsSearcher:
                 continue
 
             num = int(num) - 1
-            if not (0 <= num < len(user_defined_topics)):
+            if not 0 <= num < len(user_defined_topics):
                 print(f"Wrong topic! Please type a number from 1-{len(user_defined_topics)}")
                 print()
                 continue
@@ -213,22 +235,28 @@ class NewsSearcher:
             return list(user_defined_topics)[num]
 
     def user_choosing_by_input(self):
+        """Puts together all user based choices and displays final result in console"""
         news_outlet = self.choosing_news_outlet()
         self.create_user_defined_topics(news_outlet)
 
         topic = self.choosing_general_topic(self.user_defined_topics_filtered[news_outlet])
         self.create_user_defined_articles(news_outlet, topic)
 
-        self.print_user_defined_colection(self.user_defined_topics_articles[news_outlet][topic], "articles")
+        self.print_user_defined_collection(self.user_defined_topics_articles[news_outlet][topic],
+                                           "articles")
 
     def print_news_outlets(self):
+        """Prints out the news outlets"""
         print("Choose one of the following news outlets:")
         for i, names in enumerate(self.display_names.items()):
             internal_name, display_name = names
             print(f"\t{i + 1}. {display_name} - {self.sources[internal_name]}")
         print()
 
-    def print_user_defined_colection(self, user_defined_collection, msg, article_depth=3):
+    @staticmethod
+    def print_user_defined_collection(user_defined_collection, msg, article_depth=3):
+        """A static method which prints out a collection based on input, message and/or
+        article depth"""
         print(f"Choose one of the following {msg}:")
         depth = 0
         for i, topic_collection in enumerate(user_defined_collection.items()):
@@ -241,17 +269,20 @@ class NewsSearcher:
         print()
 
     def create_user_defined_topics(self, news_outlet):
+        """Creates topics based on users choice of news outlets"""
         self.user_defined_sources = {news_outlet: self.alternative_sources[news_outlet]}
-        self.user_defined_topics = {news_outlet: dict()}
+        self.user_defined_topics = {news_outlet: {}}
         self.find_topics(self.user_defined_sources, self.user_defined_topics)
-        self.user_defined_topics_filtered = {news_outlet: dict()}
+        self.user_defined_topics_filtered = {news_outlet: {}}
         self.find_general_topics(self.user_defined_topics, self.user_defined_topics_filtered)
         self.transform_relative_links_to_absolute_topics(self.user_defined_topics_filtered)
 
     def create_user_defined_articles(self, news_outlet, topic, article_depth=100):
+        """Creates articles based on user defined news outlets and topics within it/them"""
         self.user_defined_topics_filtered_one_topic = {news_outlet:
-                                                 {topic: self.user_defined_topics_filtered[news_outlet][topic]}}
-        self.user_defined_topics_articles = {news_outlet: {topic: dict()}}
-        self.find_articles(self.user_defined_topics_filtered_one_topic, self.user_defined_topics_articles,
+                                    {topic: self.user_defined_topics_filtered[news_outlet][topic]}}
+        self.user_defined_topics_articles = {news_outlet: {topic: {}}}
+        self.find_articles(self.user_defined_topics_filtered_one_topic,
+                           self.user_defined_topics_articles,
                            article_depth)
         self.transform_relative_links_to_absolute_articles(self.user_defined_topics_articles)
