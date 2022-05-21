@@ -603,8 +603,13 @@ class NewsSearcherFrame(NonMainFrame):
         start = 0.35
         step = 0.06
         for i in range(10):
-            article_label = Widget(Label(self.frame, text=f""),
+            article_label = Widget(Label(self.frame, text=f"", fg="blue"),
                                               Size(0, 0), rel_pos=RelPos(0.1, start + i * step))
+            article_label.widget.bind("<Enter>", lambda e, a=article_label.widget: self.article_label_change_color(a, "#33CBFF"))
+            article_label.widget.bind("<Leave>", lambda e, a=article_label.widget: self.article_label_change_color(a, "blue"))
             self.article_labels.append(article_label)
             self.widgets.append(article_label)
+
+    def article_label_change_color(self, widget, color):
+        widget.configure(fg=color)
 
