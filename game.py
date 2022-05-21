@@ -65,18 +65,20 @@ class Game:
             print(f"Opener: {self.opener.text_color}{self.opener.name}{self.opener.default_color}, "
                   f"Dealer: {self.dealer.text_color}{self.dealer.name}{self.dealer.default_color}")
         if self.create_log:
-            logging.info(f"Opener: {self.opener.name}, "
-                         f"Dealer: {self.dealer.name}")
+            logging.info("Opener: %s, "
+                         "Dealer: %s", self.opener.name, self.dealer.name)
 
     def print_info(self, info_name, info_data):
         if self.display_text:
             print(f"{info_name}{info_data} - "
-                  f"{self.p_1.text_color}{self.p_1.name}{self.p_1.default_color}: {self.p_1.get_balance()}, "
-                  f"{self.p_2.text_color}{self.p_2.name}{self.p_2.default_color}: {self.p_2.get_balance()}")
+                  f"{self.p_1.text_color}{self.p_1.name}{self.p_1.default_color}: "
+                  f"{self.p_1.get_balance()}, "
+                  f"{self.p_2.text_color}{self.p_2.name}{self.p_2.default_color}: "
+                  f"{self.p_2.get_balance()}")
         if self.create_log:
-            logging.info(f"{info_name}{info_data} - "
-                         f"{self.p_1.name}: {self.p_1.get_balance()}, "
-                         f"{self.p_2.name}: {self.p_2.get_balance()}")
+            logging.info("%s%s - %s: %s, %s: %s",
+                         info_name, info_data, self.p_1.name, self.p_1.get_balance(),
+                         self.p_2.name, self.p_2.get_balance())
 
     def choose_cards(self):
         self.p_1.card, self.p_2.card = random.sample(self.cards, k=2)
@@ -86,8 +88,7 @@ class Game:
                   f"{self.p_2.text_color}{self.p_2.name}{self.p_2.default_color} {self.p_2.card}")
 
         if self.create_log:
-            logging.info(f"\t{self.p_1.name} {self.p_1.card} - "
-                         f"{self.p_2.name} {self.p_2.card}")
+            logging.info("\t%s %s - %s %s", self.p_1.name, self.p_1.card, self.p_2.name, self.p_2.card)
 
     def reset_values(self):
         self.pool = 0
@@ -117,12 +118,12 @@ class Game:
         if self.display_text:
             print(f"\t\t{player.text_color}{player.name}{player.default_color} - {player_choice}")
         if self.create_log:
-            logging.info(f"\t\t{player.name} - {player_choice}")
+            logging.info("\t\t%s - %s", player.name, player_choice)
         if player_choice == "f":
             self.player_folded = True
             self.pay_winner(self.get_opposite_player(player),
                             message_beginning="won",
-                            message_end=f" folded", display_loser_name=True)
+                            message_end=" folded", display_loser_name=True)
         return player_choice
 
     def player_choices(self):
@@ -135,7 +136,8 @@ class Game:
             return
 
         if opener_choice == "c" and dealer_choice == "b":
-            self.player_choice(self.opener, self.opener.play_opener_choice_on_dealer_bet, dealer_choice)
+            self.player_choice(self.opener, self.opener.play_opener_choice_on_dealer_bet,
+                               dealer_choice)
 
     def pay_winner(self, winner, message_beginning="", message_end="", display_loser_name=False):
         winner.win(self.pool)
@@ -151,8 +153,9 @@ class Game:
                 print(f"{winner.text_color}{winner.name}{winner.default_color} {message_beginning} "
                       f"{self.pool}{message_end}")
         if self.create_log:
-            logging.info(f"{winner.name} {message_beginning} "
-                         f"{self.pool}{', ' + loser.name if display_loser_name else ''}{message_end}")
+            logging.info("%s %s %s%s%s",
+                         winner.name, message_beginning, self.pool,
+                         ', ' + loser.name if display_loser_name else '', message_end)
 
     def payout(self):
         if self.player_folded:
