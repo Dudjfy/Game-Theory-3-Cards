@@ -1,12 +1,19 @@
+"""Old system betting and bluffing chances data classes reworked, might be unused now"""
+
+from dataclasses import dataclass
+
+
+@dataclass
 class OpenerBetting:
-    def __init__(self, bluff_on_1=0, bluff_on_2=0, bluff_on_3=0):
-        self.bluff_on_1 = bluff_on_1
-        self.bluff_on_2 = bluff_on_2
-        self.bluff_on_3 = bluff_on_3
+    """Opener betting, old system"""
+    bluff_on_1: float = 0
+    bluff_on_2: float = 0
+    bluff_on_3: float = 0
 
 
+@dataclass
 class DealerBetting:
-    def __init__(self, bluff_on_1=1/3, bluff_on_2=1/3, bluff_on_3=0):
-        self.bluff_on_1 = bluff_on_1
-        self.bluff_on_2 = bluff_on_2
-        self.bluff_on_3 = bluff_on_3
+    """Dealer betting, old system"""
+    bluff_on_1: float = 1 / 3
+    bluff_on_2: float = 1 / 3
+    bluff_on_3: float = 0
