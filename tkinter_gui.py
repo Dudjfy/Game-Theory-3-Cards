@@ -1,9 +1,8 @@
-import time
 import webbrowser
 from tkinter import *
 from tkinter import ttk
 
-from data_structures import SimpleAIData, GameSettings
+from data_structures import GameSettings
 from game import Game
 from news_searcher import NewsSearcher
 from playable import RandomAI, Player, SimpleAI, BluffingAI
@@ -25,7 +24,7 @@ class Size:
         return f"{self.x}x{self.y}"
 
 
-class Widget:
+class WidgetLike:
     def __init__(self, widget, pos, rel_pos):
         self.widget = widget
         self.pos = pos
@@ -61,12 +60,16 @@ class TkinterGUI:
         self.game.set_display_text(True)
 
         self.main_frame = MainFrame(self, self.root, self.size, self.pad, self.margin, self.game)
-        self.game_settings_frame = GameSettingsFrame(self, self.root, self.size, self.pad, self.margin)
-        self.player_1_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad, self.margin,
+        self.game_settings_frame = GameSettingsFrame(self, self.root, self.size, self.pad,
+                                                     self.margin)
+        self.player_1_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad,
+                                                           self.margin,
                                                            self.game.p1)
-        self.player_2_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad, self.margin,
+        self.player_2_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad,
+                                                           self.margin,
                                                            self.game.p2)
-        self.news_searcher_frame = NewsSearcherFrame(self, self.root, self.size, self.pad, self.margin)
+        self.news_searcher_frame = NewsSearcherFrame(self, self.root, self.size, self.pad,
+                                                     self.margin)
 
         self.frames = {
             "main": self.main_frame,
@@ -119,7 +122,8 @@ class FrameBase:
     def load_widgets_grid(self):
         for widget in self.widgets:
             widget.widget.grid(row=widget.pos.y, column=widget.pos.x,
-                               padx=self.margin.x, pady=self.margin.y, ipadx=self.pad.x, ipady=self.pad.y)
+                               padx=self.margin.x, pady=self.margin.y, ipadx=self.pad.x,
+                               ipady=self.pad.y)
 
     def load_widgets_place(self):
         for widget in self.widgets:
@@ -154,7 +158,8 @@ class MainFrame(FrameBase):
         self.time_elapsed.set("")
 
         variables = self.parent.game_settings_frame.variables
-        p1, p2 = self.parent.player_1_settings_frame.player, self.parent.player_2_settings_frame.player
+        p1, p2 = self.parent.player_1_settings_frame.player, \
+                 self.parent.player_2_settings_frame.player
 
         self.game.display_text = variables["display_text"].get()
         self.game.create_log = variables["create_log"].get()
@@ -187,71 +192,75 @@ class MainFrame(FrameBase):
 
     def add_first_row(self):
         self.games_label_text = "Amount of games simulated:"
-        self.games_label = Widget(Label(self.frame, text=self.games_label_text),
-                                  Size(0, 0), rel_pos=RelPos(0.1, 0.15))
+        self.games_label = WidgetLike(Label(self.frame, text=self.games_label_text),
+                                      Size(0, 0), rel_pos=RelPos(0.1, 0.15))
         self.widgets.append(self.games_label)
 
-        self.games_entry = Widget(Entry(self.frame, width=20, textvariable=self.games),
-                                  Size(0, 1), rel_pos=RelPos(0.42, 0.15))
+        self.games_entry = WidgetLike(Entry(self.frame, width=20, textvariable=self.games),
+                                      Size(0, 1), rel_pos=RelPos(0.42, 0.15))
         self.widgets.append(self.games_entry)
 
-        self.settings_game_button = Widget(Button(self.frame, text="Game Settings",
-                                                  command=lambda: self.parent.load_frame_by_name("game_settings")),
-                                           pos=Size(1, 1), rel_pos=RelPos(0.72, 0.15))
+        self.settings_game_button = WidgetLike(Button(self.frame, text="Game Settings",
+                                                      command=lambda: self.parent.load_frame_by_name("game_settings")),
+                                               pos=Size(1, 1), rel_pos=RelPos(0.72, 0.15))
         self.widgets.append(self.settings_game_button)
 
     def add_second_row(self):
         self.player_1 = StringVar(self.frame, value="Simple AI")
         self.player_1.trace("w", self.options_menu_activated_1)
-        self.player_1_option_menu = Widget(OptionMenu(self.frame, self.player_1, *self.player_options),
-                                           pos=Size(1, 0), rel_pos=RelPos(0.13, 0.3))
+        self.player_1_option_menu = WidgetLike(OptionMenu(self.frame, self.player_1,
+                                                          *self.player_options),
+                                               pos=Size(1, 0), rel_pos=RelPos(0.13, 0.3))
         self.widgets.append(self.player_1_option_menu)
 
-        self.settings_player_1_button = Widget(Button(self.frame, text="Settings",
-                                                      command=lambda: self.settings("player_1_settings_frame",
-                                                                                    self.parent.player_1_settings_frame.player), state=NORMAL),
-                                               pos=Size(1, 1), rel_pos=RelPos(0.31, 0.3))
+        self.settings_player_1_button = WidgetLike(Button(self.frame, text="Settings",
+                                                          command=lambda: self.settings("player_1_settings_frame",
+                                        self.parent.player_1_settings_frame.player), state=NORMAL),
+                                                   pos=Size(1, 1), rel_pos=RelPos(0.31, 0.3))
         self.widgets.append(self.settings_player_1_button)
 
-        self.vs_label = Widget(Label(self.frame, text="VS"),
-                               Size(1, 1), rel_pos=RelPos(0.49, 0.3))
+        self.vs_label = WidgetLike(Label(self.frame, text="VS"),
+                                   Size(1, 1), rel_pos=RelPos(0.49, 0.3))
         self.widgets.append(self.vs_label)
 
         self.player_2 = StringVar(self.frame, value="Bluffing AI")
         self.player_2.trace("w", self.options_menu_activated_2)
-        self.player_2_option_menu = Widget(OptionMenu(self.frame, self.player_2, *self.player_options),
-                                           pos=Size(1, 2), rel_pos=RelPos(0.59, 0.3))
+        self.player_2_option_menu = WidgetLike(OptionMenu(self.frame, self.player_2,
+                                                          *self.player_options),
+                                               pos=Size(1, 2), rel_pos=RelPos(0.59, 0.3))
         self.widgets.append(self.player_2_option_menu)
 
-        self.settings_player_2_button = Widget(Button(self.frame, text="Settings",
-                                                      command=lambda: self.settings("player_2_settings_frame",
-                                                                                    self.parent.player_2_settings_frame.player), state=NORMAL),
-                                               pos=Size(1, 1), rel_pos=RelPos(0.77, 0.3))
+        self.settings_player_2_button = WidgetLike(Button(self.frame, text="Settings",
+                                                          command=lambda: self.settings("player_2_settings_frame",
+                                        self.parent.player_2_settings_frame.player), state=NORMAL),
+                                                   pos=Size(1, 1), rel_pos=RelPos(0.77, 0.3))
         self.widgets.append(self.settings_player_2_button)
 
     def add_third_row(self):
-        self.run = Widget(Button(self.frame, text="Run", bg="green", command=self.run, width=14, height=3),
-                          pos=Size(2, 1), rel_pos=RelPos(0.42, 0.5))
-        self.widgets.append(self.run)
+        self.run_button = WidgetLike(Button(self.frame, text="Run", bg="green", command=self.run, width=14,
+                                     height=3),
+                              pos=Size(2, 1), rel_pos=RelPos(0.42, 0.5))
+        self.widgets.append(self.run_button)
 
     def add_fourth_row(self):
-        self.stop = Widget(Button(self.frame, text="Stop", command=self.stop, width=6, height=1),
-                          pos=Size(2, 1), rel_pos=RelPos(0.475, 0.62))
-        self.widgets.append(self.stop)
+        self.stop_button = WidgetLike(Button(self.frame, text="Stop", command=self.stop, width=6, height=1),
+                               pos=Size(2, 1), rel_pos=RelPos(0.475, 0.62))
+        self.widgets.append(self.stop_button)
 
     def add_fifth_row(self):
-        self.progress_bar = Widget(ttk.Progressbar(self.frame, orient=HORIZONTAL, length=400, mode="determinate"),
-                                   pos=Size(3, 1), rel_pos=RelPos(0.27, 0.80))
+        self.progress_bar = WidgetLike(ttk.Progressbar(self.frame, orient=HORIZONTAL, length=400,
+                                                       mode="determinate"),
+                                       pos=Size(3, 1), rel_pos=RelPos(0.27, 0.80))
         self.widgets.append(self.progress_bar)
 
     def add_sixth_row(self):
         self.time_elapsed = StringVar(self.frame, value="")
-        self.time_elapsed_label = Widget(Label(self.frame, textvariable=self.time_elapsed),
-                                   pos=Size(3, 1), rel_pos=RelPos(0.49, 0.75))
+        self.time_elapsed_label = WidgetLike(Label(self.frame, textvariable=self.time_elapsed),
+                                             pos=Size(3, 1), rel_pos=RelPos(0.49, 0.75))
         self.widgets.append(self.time_elapsed_label)
 
     def add_seventh_row(self):
-        self.news_searcher_button = Widget(Button(self.frame, text="News Searcher",
+        self.news_searcher_button = WidgetLike(Button(self.frame, text="News Searcher",
                                                       command=lambda: self.parent.load_frame_by_name("news_searcher")),
                                                pos=Size(1, 1), rel_pos=RelPos(0.43, 0.92))
         self.widgets.append(self.news_searcher_button)
@@ -286,9 +295,9 @@ class NonMainFrame(FrameBase):
         self.create_main_frame_button()
 
     def create_main_frame_button(self):
-        self.return_to_main_frame_button = Widget(Button(self.frame, text="Main",
-                                                         command=self.return_to_main),
-                                                  pos=Size(0, 0), rel_pos=RelPos(0.02, 0.05))
+        self.return_to_main_frame_button = WidgetLike(Button(self.frame, text="Main",
+                                                             command=self.return_to_main),
+                                                      pos=Size(0, 0), rel_pos=RelPos(0.02, 0.05))
         self.widgets.append(self.return_to_main_frame_button)
 
     def return_to_main(self):
@@ -299,13 +308,16 @@ class PlayerSettingsFrame(NonMainFrame):
     p1_options = {
         "Random AI": RandomAI("Random AI 1", text_color=Fore.RED),
         "Simple AI": SimpleAI("Simple AI 1", data_path="simple_ai_data_1.txt", text_color=Fore.RED),
-        "Bluffing AI": BluffingAI("Bluffing AI 1", data_path="bluffing_ai_data_1.txt", text_color=Fore.RED),
+        "Bluffing AI": BluffingAI("Bluffing AI 1", data_path="bluffing_ai_data_1.txt",
+                                  text_color=Fore.RED),
         "Human": Player("Player 1", text_color=Fore.RED),
     }
     p2_options = {
         "Random AI": RandomAI("Random AI 2", text_color=Fore.BLUE),
-        "Simple AI": SimpleAI("Simple AI 2", data_path="simple_ai_data_2.txt", text_color=Fore.BLUE),
-        "Bluffing AI": BluffingAI("Bluffing AI 2", data_path="bluffing_ai_data_2.txt", text_color=Fore.BLUE),
+        "Simple AI": SimpleAI("Simple AI 2", data_path="simple_ai_data_2.txt",
+                              text_color=Fore.BLUE),
+        "Bluffing AI": BluffingAI("Bluffing AI 2", data_path="bluffing_ai_data_2.txt",
+                                  text_color=Fore.BLUE),
         "Human": Player("Player 2", text_color=Fore.BLUE),
     }
 
@@ -331,11 +343,11 @@ class PlayerSettingsFrame(NonMainFrame):
 
     def create_data_widget(self, setting_data, names, x=0, y=0):
         self.variables.append(VariableStorage(names, DoubleVar(value=setting_data)))
-        field = Widget(Entry(self.frame, width=4, textvariable=self.variables[-1].variable),
-                       Size(x, y), rel_pos=RelPos())
+        field = WidgetLike(Entry(self.frame, width=4, textvariable=self.variables[-1].variable),
+                           Size(x, y), rel_pos=RelPos())
         self.widgets.append(field)
 
-    def create_layout_from_data(self, show_values_in_labels=False):
+    def create_layout_from_data(self):
         self.create_main_frame_button()
         self.create_save_widgets()
 
@@ -344,31 +356,32 @@ class PlayerSettingsFrame(NonMainFrame):
         y = 1
         x = 1
         for name, element in self.structured_data.data.items():
-            label = Widget(Label(self.frame, text=name),
-                           Size(x, y), rel_pos=RelPos())
+            label = WidgetLike(Label(self.frame, text=name),
+                               Size(x, y), rel_pos=RelPos())
             self.widgets.append(label)
 
             y += 1
             if x > 1:
                 for name2, element2 in element.items():
-                    label = Widget(Label(self.frame, text=name2),
-                                   Size(x, y), rel_pos=RelPos())
+                    label = WidgetLike(Label(self.frame, text=name2),
+                                       Size(x, y), rel_pos=RelPos())
                     self.widgets.append(label)
 
                     y += 1
                     for name3, element3 in element2.items():
-                        label = Widget(Label(self.frame, text=name3),
-                                       Size(x, y), rel_pos=RelPos())
+                        label = WidgetLike(Label(self.frame, text=name3),
+                                           Size(x, y), rel_pos=RelPos())
                         self.widgets.append(label)
 
                         y += 1
                         for name4, element4 in element3.items():
-                            label = Widget(Label(self.frame, text=name4),
-                                           Size(x, y), rel_pos=RelPos())
+                            label = WidgetLike(Label(self.frame, text=name4),
+                                               Size(x, y), rel_pos=RelPos())
                             self.widgets.append(label)
 
                             names = [name, name2, name3, name4]
-                            setting_data = self.structured_data.get_dict_element_by_keys_looping(names)
+                            setting_data = self.structured_data.get_dict_element_by_keys_looping(
+                                names)
                             self.create_data_widget(setting_data, names, x + 1, y)
 
                             y += 1
@@ -377,14 +390,14 @@ class PlayerSettingsFrame(NonMainFrame):
                     y = 2
             else:
                 for name2, element2 in element.items():
-                    label = Widget(Label(self.frame, text=name2),
-                                   Size(x, y), rel_pos=RelPos())
+                    label = WidgetLike(Label(self.frame, text=name2),
+                                       Size(x, y), rel_pos=RelPos())
                     self.widgets.append(label)
 
                     y += 1
                     for name3, element3 in element2.items():
-                        label = Widget(Label(self.frame, text=name3),
-                                       Size(x, y), rel_pos=RelPos())
+                        label = WidgetLike(Label(self.frame, text=name3),
+                                           Size(x, y), rel_pos=RelPos())
                         self.widgets.append(label)
 
                         names = [name, name2, name3]
@@ -421,12 +434,12 @@ class PlayerSettingsFrame(NonMainFrame):
             self.create_layout_from_data()
 
     def create_save_widgets(self):
-        self.save_button = Widget(Button(self.frame, text="Save",
-                                         command=self.save_data),
-                                  pos=Size(13, 13), rel_pos=RelPos(0.02, 0.05))
+        self.save_button = WidgetLike(Button(self.frame, text="Save",
+                                             command=self.save_data),
+                                      pos=Size(13, 13), rel_pos=RelPos(0.02, 0.05))
         self.widgets.append(self.save_button)
-        self.saved_label = Widget(Label(self.frame, text=""),
-                                  pos=Size(13, 12), rel_pos=RelPos(0.02, 0.05))
+        self.saved_label = WidgetLike(Label(self.frame, text=""),
+                                      pos=Size(13, 12), rel_pos=RelPos(0.02, 0.05))
         self.widgets.append(self.saved_label)
 
 
@@ -438,12 +451,12 @@ class GameSettingsFrame(NonMainFrame):
 
         self.create_layout_from_data()
 
-        self.save_button = Widget(Button(self.frame, text="Save",
-                                         command=self.save_data),
-                                  pos=Size(4, 8), rel_pos=RelPos(0.02, 0.05))
+        self.save_button = WidgetLike(Button(self.frame, text="Save",
+                                             command=self.save_data),
+                                      pos=Size(4, 8), rel_pos=RelPos(0.02, 0.05))
         self.widgets.append(self.save_button)
-        self.saved_label = Widget(Label(self.frame, text=""),
-                                  pos=Size(5, 8), rel_pos=RelPos(0.02, 0.05))
+        self.saved_label = WidgetLike(Label(self.frame, text=""),
+                                      pos=Size(5, 8), rel_pos=RelPos(0.02, 0.05))
         self.widgets.append(self.saved_label)
 
         self.load_widgets_grid()
@@ -453,32 +466,36 @@ class GameSettingsFrame(NonMainFrame):
         self.saved_label.widget["text"] = ""
         self.parent.load_frame_by_name("main")
 
-    def create_data_widget(self, setting_data, name, y, variable_type, widget_type, show_values_in_labels=False):
+    def create_data_widget(self, setting_data, name, y, variable_type, widget_type,
+                           show_values_in_labels=False):
         self.variables[name] = variable_type(name=name, value=setting_data)
         if isinstance(setting_data, bool):
-            field = Widget(widget_type(self.frame, width=1, height=1, variable=self.variables[name]),
-                           Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
+            field = WidgetLike(widget_type(self.frame, width=1, height=1,
+                                           variable=self.variables[name]),
+                               Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
         else:
-            field = Widget(widget_type(self.frame, width=20, textvariable=self.variables[name]),
-                           Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
+            field = WidgetLike(widget_type(self.frame, width=20, textvariable=self.variables[name]),
+                               Size(2, y + 1), rel_pos=RelPos(0.42, 0.15))
         self.widgets.append(field)
 
         if show_values_in_labels:
-            label = Widget(Label(self.frame, textvariable=self.variables[name]),
-                           Size(3, y + 1), rel_pos=RelPos())
+            label = WidgetLike(Label(self.frame, textvariable=self.variables[name]),
+                               Size(3, y + 1), rel_pos=RelPos())
             self.widgets.append(label)
 
     def create_layout_from_data(self, show_values_in_labels=False):
         for y, name in enumerate(self.structured_data.data):
-            label = Widget(Label(self.frame, text=name),
-                           Size(1, y + 1), rel_pos=RelPos())
+            label = WidgetLike(Label(self.frame, text=name),
+                               Size(1, y + 1), rel_pos=RelPos())
             self.widgets.append(label)
 
             setting_data = self.structured_data.data[name]
             if isinstance(setting_data, float):
-                self.create_data_widget(setting_data, name, y, DoubleVar, Entry, show_values_in_labels)
+                self.create_data_widget(setting_data, name, y, DoubleVar, Entry,
+                                        show_values_in_labels)
             elif isinstance(setting_data, bool):
-                self.create_data_widget(setting_data, name, y, BooleanVar, Checkbutton, show_values_in_labels)
+                self.create_data_widget(setting_data, name, y, BooleanVar, Checkbutton,
+                                        show_values_in_labels)
             elif isinstance(setting_data, int):
                 self.create_data_widget(setting_data, name, y, IntVar, Entry, show_values_in_labels)
 
@@ -556,52 +573,58 @@ class NewsSearcherFrame(NonMainFrame):
         news_outlet = self.news_outlet.get().lower()
         topic = self.topic.get().lower()
 
-        self.news_searcher.create_user_defined_articles(news_outlet, topic, self.article_depth.get())
+        self.news_searcher.create_user_defined_articles(news_outlet, topic,
+                                                        self.article_depth.get())
 
         for i, article_collection in enumerate(
-                self.news_searcher.user_defined_topics_articles[news_outlet][self.topic.get().lower()].items()):
+                self.news_searcher.user_defined_topics_articles[news_outlet][
+                    self.topic.get().lower()].items()):
             article, link = article_collection
             self.article_labels[i].widget["text"] = f"{article:<.80}..."
-            self.article_labels[i].widget.bind("<Button-1>", lambda e, url=link: self.open_link_in_browser(url))
+            self.article_labels[i].widget.bind("<Button-1>",
+                                               lambda e, url=link: self.open_link_in_browser(url))
 
     def add_news_outlet(self):
-        self.news_outlet_label = Widget(Label(self.frame, text="News Outlets"),
-                                        Size(0, 0), rel_pos=RelPos(0.08, self.label_height))
+        self.news_outlet_label = WidgetLike(Label(self.frame, text="News Outlets"),
+                                            Size(0, 0), rel_pos=RelPos(0.08, self.label_height))
         self.widgets.append(self.news_outlet_label)
 
         self.news_outlet = StringVar(self.frame, value="None")
         self.news_outlet.trace("w", self.news_outlet_options_menu_activated)
-        self.news_outlet_option_menu = Widget(OptionMenu(self.frame, self.news_outlet, *self.news_options),
-                                              pos=Size(1, 0), rel_pos=RelPos(0.1, self.option_menu_height))
+        self.news_outlet_option_menu = WidgetLike(OptionMenu(self.frame, self.news_outlet,
+                                                             *self.news_options),
+                                                  pos=Size(1, 0),
+                                                  rel_pos=RelPos(0.1,self.option_menu_height))
         self.widgets.append(self.news_outlet_option_menu)
 
     def add_topic(self):
-        self.topics_label = Widget(Label(self.frame, text="Topics"),
-                                   Size(0, 0), rel_pos=RelPos(0.325, self.label_height))
+        self.topics_label = WidgetLike(Label(self.frame, text="Topics"),
+                                       Size(0, 0), rel_pos=RelPos(0.325, self.label_height))
         self.widgets.append(self.topics_label)
 
         self.topic = StringVar(self.frame, value="Nyheter")
         self.topic.trace("w", self.topic_options_menu_activated)
-        self.topic_option_menu = Widget(OptionMenu(self.frame, self.topic, self.topic.get()),
-                                        pos=Size(1, 0), rel_pos=RelPos(0.3, self.option_menu_height))
+        self.topic_option_menu = WidgetLike(OptionMenu(self.frame, self.topic, self.topic.get()),
+                                            pos=Size(1, 0), rel_pos=RelPos(0.3, self.option_menu_height))
         self.topic_option_menu.widget.configure(state="disabled")
         self.widgets.append(self.topic_option_menu)
 
     def add_article_depth(self):
-        self.article_depth_label = Widget(Label(self.frame, text="# of Articles"),
-                                          Size(0, 0), rel_pos=RelPos(0.45, self.label_height))
+        self.article_depth_label = WidgetLike(Label(self.frame, text="# of Articles"),
+                                              Size(0, 0), rel_pos=RelPos(0.45, self.label_height))
         self.widgets.append(self.article_depth_label)
 
         self.article_depth = IntVar(self.frame, value=3)
         self.article_depth.trace("w", self.article_depth_options_menu_activated)
-        self.article_depth_option_menu = Widget(OptionMenu(self.frame, self.article_depth, *[1, 3, 5, 10]),
-                                                pos=Size(1, 0), rel_pos=RelPos(0.49, self.option_menu_height))
+        self.article_depth_option_menu = WidgetLike(OptionMenu(self.frame, self.article_depth,
+                                                               *[1, 3, 5, 10]),
+                                                    pos=Size(1, 0), rel_pos=RelPos(0.49, self.option_menu_height))
         self.widgets.append(self.article_depth_option_menu)
 
     def add_search(self):
-        self.search_button = Widget(Button(self.frame, text="Search Articles",
-                                           command=self.search_articles),
-                                    pos=Size(0, 0), rel_pos=RelPos(0.60, self.option_menu_height))
+        self.search_button = WidgetLike(Button(self.frame, text="Search Articles",
+                                               command=self.search_articles),
+                                        pos=Size(0, 0), rel_pos=RelPos(0.60, self.option_menu_height))
         self.search_button.widget.configure(state="disabled")
 
         self.widgets.append(self.search_button)
@@ -611,11 +634,14 @@ class NewsSearcherFrame(NonMainFrame):
         start = 0.35
         step = 0.06
         for i in range(10):
-            article_label = Widget(Label(self.frame, text=f"", fg="blue"),
-                                              Size(0, 0), rel_pos=RelPos(0.1, start + i * step))
+            article_label = WidgetLike(Label(self.frame, text="", fg="blue"),
+                                       Size(0, 0), rel_pos=RelPos(0.1, start + i * step))
             widget = article_label.widget
-            widget.bind("<Enter>", lambda e, article=widget: self.article_label_change_color(article, "#33CBFF"))
-            widget.bind("<Leave>", lambda e, article=widget: self.article_label_change_color(article, "blue"))
+            widget.bind("<Enter>",
+                        lambda e, article=widget: self.article_label_change_color(article,
+                                                                                  "#33CBFF"))
+            widget.bind("<Leave>",
+                        lambda e, article=widget: self.article_label_change_color(article, "blue"))
             self.article_labels.append(article_label)
             self.widgets.append(article_label)
 
@@ -624,5 +650,3 @@ class NewsSearcherFrame(NonMainFrame):
 
     def open_link_in_browser(self, url):
         webbrowser.open_new(url)
-
-

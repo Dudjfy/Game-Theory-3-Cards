@@ -1,4 +1,3 @@
-from line_profiler_pycharm import profile
 from card import Card
 import matplotlib.pyplot as plt
 import random
@@ -79,7 +78,6 @@ class Game:
                          f"{self.p1.name}: {self.p1.get_balance()}, "
                          f"{self.p2.name}: {self.p2.get_balance()}")
 
-    @profile
     def choose_cards(self):
         self.p1.card, self.p2.card = random.sample(self.cards, k=2)
 
@@ -97,7 +95,6 @@ class Game:
         self.dealer = None
         self.player_folded = False
 
-    @profile
     def initial_setup(self, game):
         self.reset_values()
         self.players_bets()
