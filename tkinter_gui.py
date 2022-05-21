@@ -1,4 +1,5 @@
 import time
+import webbrowser
 from tkinter import *
 from tkinter import ttk
 
@@ -522,6 +523,9 @@ class NewsSearcherFrame(NonMainFrame):
         self.load_widgets_place()
 
     def news_outlet_options_menu_activated(self, *args):
+        for article_label in self.article_labels:
+            article_label.widget["text"] = ""
+
         if self.news_outlet.get() == "None":
             self.topic_option_menu.widget.configure(state="disabled")
             self.search_button.widget.configure(state="disabled")
@@ -546,6 +550,9 @@ class NewsSearcherFrame(NonMainFrame):
         pass
 
     def search_articles(self):
+        for article_label in self.article_labels:
+            article_label.widget["text"] = ""
+
         news_outlet = self.news_outlet.get().lower()
         topic = self.topic.get().lower()
 
@@ -555,6 +562,7 @@ class NewsSearcherFrame(NonMainFrame):
                 self.news_searcher.user_defined_topics_articles[news_outlet][self.topic.get().lower()].items()):
             article, link = article_collection
             self.article_labels[i].widget["text"] = f"{article:<.80}..."
+            self.article_labels[i].widget.bind("<Button-1>", lambda e, url=link: self.open_link_in_browser(url))
 
     def add_news_outlet(self):
         self.news_outlet_label = Widget(Label(self.frame, text="News Outlets"),
@@ -605,11 +613,16 @@ class NewsSearcherFrame(NonMainFrame):
         for i in range(10):
             article_label = Widget(Label(self.frame, text=f"", fg="blue"),
                                               Size(0, 0), rel_pos=RelPos(0.1, start + i * step))
-            article_label.widget.bind("<Enter>", lambda e, a=article_label.widget: self.article_label_change_color(a, "#33CBFF"))
-            article_label.widget.bind("<Leave>", lambda e, a=article_label.widget: self.article_label_change_color(a, "blue"))
+            widget = article_label.widget
+            widget.bind("<Enter>", lambda e, article=widget: self.article_label_change_color(article, "#33CBFF"))
+            widget.bind("<Leave>", lambda e, article=widget: self.article_label_change_color(article, "blue"))
             self.article_labels.append(article_label)
             self.widgets.append(article_label)
 
     def article_label_change_color(self, widget, color):
         widget.configure(fg=color)
+
+    def open_link_in_browser(self, url):
+        webbrowser.open_new(url)
+
 
