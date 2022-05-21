@@ -9,16 +9,16 @@ logging.basicConfig(filename="log.log", level=logging.INFO, format="%(message)s"
 
 
 class Game:
-    def __init__(self, p1, p2, games=1, display_text=False, create_log=False, use_game_separators=True,
+    def __init__(self, p_1, p_2, games=1, display_text=False, create_log=False, use_game_separators=True,
                  same_opener_and_dealer=False):
         self.break_loop = False
         self.games = games
-        self.score_p1 = 0
-        self.score_p2 = 0
+        self.score_p_1 = 0
+        self.score_p_2 = 0
         self.cards = [Card(1), Card(2), Card(3)]
-        self.p1 = p1
-        self.p2 = p2
-        self.players = [self.p1, self.p2]
+        self.p_1 = p_1
+        self.p_2 = p_2
+        self.players = [self.p_1, self.p_2]
 
         self.pool = 0
         self.opener = None
@@ -34,9 +34,9 @@ class Game:
         for p in self.players:
             p.reset()
 
-    def set_player(self, p1, p2):
-        self.p1, self.p2 = p1, p2
-        self.players = [self.p1, self.p2]
+    def set_player(self, p_1, p_2):
+        self.p_1, self.p_2 = p_1, p_2
+        self.players = [self.p_1, self.p_2]
 
     def set_display_text(self, display_text):
         self.display_text = display_text
@@ -55,11 +55,11 @@ class Game:
 
     def choose_opener_and_dealer(self, i):
         if not self.same_opener_and_dealer:
-            self.opener = self.p1 if i % 2 == 0 else self.p2
-            self.dealer = self.p2 if i % 2 == 0 else self.p1
+            self.opener = self.p_1 if i % 2 == 0 else self.p_2
+            self.dealer = self.p_2 if i % 2 == 0 else self.p_1
         else:
-            self.opener = self.p1
-            self.dealer = self.p2
+            self.opener = self.p_1
+            self.dealer = self.p_2
 
         if self.display_text:
             print(f"Opener: {self.opener.text_color}{self.opener.name}{self.opener.default_color}, "
@@ -71,23 +71,23 @@ class Game:
     def print_info(self, info_name, info_data):
         if self.display_text:
             print(f"{info_name}{info_data} - "
-                  f"{self.p1.text_color}{self.p1.name}{self.p1.default_color}: {self.p1.get_balance()}, "
-                  f"{self.p2.text_color}{self.p2.name}{self.p2.default_color}: {self.p2.get_balance()}")
+                  f"{self.p_1.text_color}{self.p_1.name}{self.p_1.default_color}: {self.p_1.get_balance()}, "
+                  f"{self.p_2.text_color}{self.p_2.name}{self.p_2.default_color}: {self.p_2.get_balance()}")
         if self.create_log:
             logging.info(f"{info_name}{info_data} - "
-                         f"{self.p1.name}: {self.p1.get_balance()}, "
-                         f"{self.p2.name}: {self.p2.get_balance()}")
+                         f"{self.p_1.name}: {self.p_1.get_balance()}, "
+                         f"{self.p_2.name}: {self.p_2.get_balance()}")
 
     def choose_cards(self):
-        self.p1.card, self.p2.card = random.sample(self.cards, k=2)
+        self.p_1.card, self.p_2.card = random.sample(self.cards, k=2)
 
         if self.display_text:
-            print(f"\t{self.p1.text_color}{self.p1.name}{self.p1.default_color} {self.p1.card} - "
-                  f"{self.p2.text_color}{self.p2.name}{self.p2.default_color} {self.p2.card}")
+            print(f"\t{self.p_1.text_color}{self.p_1.name}{self.p_1.default_color} {self.p_1.card} - "
+                  f"{self.p_2.text_color}{self.p_2.name}{self.p_2.default_color} {self.p_2.card}")
 
         if self.create_log:
-            logging.info(f"\t{self.p1.name} {self.p1.card} - "
-                         f"{self.p2.name} {self.p2.card}")
+            logging.info(f"\t{self.p_1.name} {self.p_1.card} - "
+                         f"{self.p_2.name} {self.p_2.card}")
 
     def reset_values(self):
         self.pool = 0

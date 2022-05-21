@@ -1,12 +1,14 @@
-import webbrowser
-from tkinter import *
-from tkinter import ttk
+"""Tkinter GUI module for the simulations program and news searcher"""
 
+import webbrowser
+from tkinter import ttk, Tk, Frame, IntVar, Label, Entry, Button, StringVar, OptionMenu, NORMAL, \
+    HORIZONTAL, DoubleVar, BooleanVar, Checkbutton, W, DISABLED
+
+from colorama import Fore
 from data_structures import GameSettings
 from game import Game
 from news_searcher import NewsSearcher
 from playable import RandomAI, Player, SimpleAI, BluffingAI
-from colorama import Fore, Back, Style
 
 
 class RelPos:
@@ -64,10 +66,10 @@ class TkinterGUI:
                                                      self.margin)
         self.player_1_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad,
                                                            self.margin,
-                                                           self.game.p1)
+                                                           self.game.p_1)
         self.player_2_settings_frame = PlayerSettingsFrame(self, self.root, self.size, self.pad,
                                                            self.margin,
-                                                           self.game.p2)
+                                                           self.game.p_2)
         self.news_searcher_frame = NewsSearcherFrame(self, self.root, self.size, self.pad,
                                                      self.margin)
 
@@ -109,8 +111,8 @@ class FrameBase:
         self.pad = pad
         self.margin = margin
 
-        root.bind("<Return>", lambda event: self.focus_out(event))
-        root.bind("<Escape>", lambda event: self.focus_out(event))
+        root.bind("<Return>", self.focus_out)
+        root.bind("<Escape>", self.focus_out)
 
         self.widgets = []
 
@@ -129,7 +131,7 @@ class FrameBase:
         for widget in self.widgets:
             widget.widget.place(relx=widget.rel_pos.x, rely=widget.rel_pos.y, anchor=W)
 
-    def focus_out(self, event):
+    def focus_out(self):
         self.frame.focus_set()
 
     def clear_frame(self):
@@ -150,7 +152,7 @@ class MainFrame(FrameBase):
         self.add_widgets()
 
     def settings(self, frame_name, player):
-        if isinstance(player, SimpleAI) or isinstance(player, BluffingAI):
+        if isinstance(player, (SimpleAI, BluffingAI)):
             self.parent.load_frame_by_name(frame_name)
 
     def run(self):
@@ -158,20 +160,20 @@ class MainFrame(FrameBase):
         self.time_elapsed.set("")
 
         variables = self.parent.game_settings_frame.variables
-        p1, p2 = self.parent.player_1_settings_frame.player, \
-                 self.parent.player_2_settings_frame.player
+        p_1 = self.parent.player_1_settings_frame.player
+        p_2 = self.parent.player_2_settings_frame.player
 
         self.game.display_text = variables["display_text"].get()
         self.game.create_log = variables["create_log"].get()
         self.game.use_game_separators = variables["use_game_separator"].get()
         self.game.same_opener_and_dealer = variables["same_opener_and_dealer"].get()
-        self.game.set_player(p1, p2)
+        self.game.set_player(p_1, p_2)
 
         self.game.play_games(variables["print_elapsed_time"].get(),
                              variables["print_portions"].get(),
                              variables["print_progress"].get(),
-                             lambda percentage: self.update_progress_bar(percentage),
-                             lambda time_elapsed: self.change_time_elapsed(time_elapsed))
+                             self.update_progress_bar,
+                             self.change_time_elapsed)
 
         if variables["display_matplotlib_results"].get():
             self.game.display_matplotlib_results()
@@ -201,7 +203,7 @@ class MainFrame(FrameBase):
         self.widgets.append(self.games_entry)
 
         self.settings_game_button = WidgetLike(Button(self.frame, text="Game Settings",
-                                                      command=lambda: self.parent.load_frame_by_name("game_settings")),
+                                command=lambda: self.parent.load_frame_by_name("game_settings")),
                                                pos=Size(1, 1), rel_pos=RelPos(0.72, 0.15))
         self.widgets.append(self.settings_game_button)
 
@@ -214,7 +216,7 @@ class MainFrame(FrameBase):
         self.widgets.append(self.player_1_option_menu)
 
         self.settings_player_1_button = WidgetLike(Button(self.frame, text="Settings",
-                                                          command=lambda: self.settings("player_1_settings_frame",
+                                        command=lambda: self.settings("player_1_settings_frame",
                                         self.parent.player_1_settings_frame.player), state=NORMAL),
                                                    pos=Size(1, 1), rel_pos=RelPos(0.31, 0.3))
         self.widgets.append(self.settings_player_1_button)
@@ -231,19 +233,21 @@ class MainFrame(FrameBase):
         self.widgets.append(self.player_2_option_menu)
 
         self.settings_player_2_button = WidgetLike(Button(self.frame, text="Settings",
-                                                          command=lambda: self.settings("player_2_settings_frame",
+                                        command=lambda: self.settings("player_2_settings_frame",
                                         self.parent.player_2_settings_frame.player), state=NORMAL),
                                                    pos=Size(1, 1), rel_pos=RelPos(0.77, 0.3))
         self.widgets.append(self.settings_player_2_button)
 
     def add_third_row(self):
-        self.run_button = WidgetLike(Button(self.frame, text="Run", bg="green", command=self.run, width=14,
+        self.run_button = WidgetLike(Button(self.frame, text="Run", bg="green", command=self.run,
+                                            width=14,
                                      height=3),
                               pos=Size(2, 1), rel_pos=RelPos(0.42, 0.5))
         self.widgets.append(self.run_button)
 
     def add_fourth_row(self):
-        self.stop_button = WidgetLike(Button(self.frame, text="Stop", command=self.stop, width=6, height=1),
+        self.stop_button = WidgetLike(Button(self.frame, text="Stop", command=self.stop, width=6,
+                                             height=1),
                                pos=Size(2, 1), rel_pos=RelPos(0.475, 0.62))
         self.widgets.append(self.stop_button)
 
@@ -261,7 +265,7 @@ class MainFrame(FrameBase):
 
     def add_seventh_row(self):
         self.news_searcher_button = WidgetLike(Button(self.frame, text="News Searcher",
-                                                      command=lambda: self.parent.load_frame_by_name("news_searcher")),
+                                command=lambda: self.parent.load_frame_by_name("news_searcher")),
                                                pos=Size(1, 1), rel_pos=RelPos(0.43, 0.92))
         self.widgets.append(self.news_searcher_button)
 
@@ -276,13 +280,13 @@ class MainFrame(FrameBase):
         self.time_elapsed.set(f"{time_elapsed}s")
 
     def options_menu_activated_1(self, *args):
-        self.parent.player_1_settings_frame.change_player(self.player_1.get(), "p1")
+        self.parent.player_1_settings_frame.change_player(self.player_1.get(), "p_1")
         self.settings_player_1_button.widget["state"] = DISABLED
         if self.player_1.get() in self.players_with_data:
             self.settings_player_1_button.widget["state"] = NORMAL
 
     def options_menu_activated_2(self, *args):
-        self.parent.player_2_settings_frame.change_player(self.player_2.get(), "p2")
+        self.parent.player_2_settings_frame.change_player(self.player_2.get(), "p_2")
         self.settings_player_2_button.widget["state"] = DISABLED
         if self.player_2.get() in self.players_with_data:
             self.settings_player_2_button.widget["state"] = NORMAL
@@ -305,14 +309,14 @@ class NonMainFrame(FrameBase):
 
 
 class PlayerSettingsFrame(NonMainFrame):
-    p1_options = {
+    p_1_options = {
         "Random AI": RandomAI("Random AI 1", text_color=Fore.RED),
         "Simple AI": SimpleAI("Simple AI 1", data_path="simple_ai_data_1.txt", text_color=Fore.RED),
         "Bluffing AI": BluffingAI("Bluffing AI 1", data_path="bluffing_ai_data_1.txt",
                                   text_color=Fore.RED),
         "Human": Player("Player 1", text_color=Fore.RED),
     }
-    p2_options = {
+    p_2_options = {
         "Random AI": RandomAI("Random AI 2", text_color=Fore.BLUE),
         "Simple AI": SimpleAI("Simple AI 2", data_path="simple_ai_data_2.txt",
                               text_color=Fore.BLUE),
@@ -374,7 +378,7 @@ class PlayerSettingsFrame(NonMainFrame):
                         self.widgets.append(label)
 
                         y += 1
-                        for name4, element4 in element3.items():
+                        for name4 in element3:
                             label = WidgetLike(Label(self.frame, text=name4),
                                                Size(x, y), rel_pos=RelPos())
                             self.widgets.append(label)
@@ -421,14 +425,14 @@ class PlayerSettingsFrame(NonMainFrame):
             self.saved_label.widget["fg"] = "black"
 
     def change_player(self, player, player_list):
-        self.player = self.p1_options[player] if player_list == "p1" else self.p2_options[player]
+        self.player = self.p_1_options[player] if player_list == "p_1" else self.p_2_options[player]
         # print(self.player)
         self.construct_data()
 
     def construct_data(self):
-        if isinstance(self.player, Player) or isinstance(self.player, RandomAI):
+        if isinstance(self.player, (Player, RandomAI)):
             self.structured_data = None
-        elif isinstance(self.player, SimpleAI) or isinstance(self.player, BluffingAI):
+        elif isinstance(self.player, (SimpleAI, BluffingAI)):
             self.structured_data = self.player.structured_data
             self.frame = Frame(self.root, width=self.size.x, height=self.size.y)
             self.create_layout_from_data()
@@ -447,7 +451,7 @@ class GameSettingsFrame(NonMainFrame):
     def __init__(self, parent, root, size, pad, margin):
         super().__init__(parent, root, size, pad, margin)
         self.structured_data = GameSettings()
-        self.variables = dict()
+        self.variables = {}
 
         self.create_layout_from_data()
 
@@ -605,7 +609,7 @@ class NewsSearcherFrame(NonMainFrame):
         self.topic = StringVar(self.frame, value="Nyheter")
         self.topic.trace("w", self.topic_options_menu_activated)
         self.topic_option_menu = WidgetLike(OptionMenu(self.frame, self.topic, self.topic.get()),
-                                            pos=Size(1, 0), rel_pos=RelPos(0.3, self.option_menu_height))
+                                    pos=Size(1, 0), rel_pos=RelPos(0.3, self.option_menu_height))
         self.topic_option_menu.widget.configure(state="disabled")
         self.widgets.append(self.topic_option_menu)
 
@@ -618,13 +622,13 @@ class NewsSearcherFrame(NonMainFrame):
         self.article_depth.trace("w", self.article_depth_options_menu_activated)
         self.article_depth_option_menu = WidgetLike(OptionMenu(self.frame, self.article_depth,
                                                                *[1, 3, 5, 10]),
-                                                    pos=Size(1, 0), rel_pos=RelPos(0.49, self.option_menu_height))
+                                    pos=Size(1, 0), rel_pos=RelPos(0.49, self.option_menu_height))
         self.widgets.append(self.article_depth_option_menu)
 
     def add_search(self):
         self.search_button = WidgetLike(Button(self.frame, text="Search Articles",
                                                command=self.search_articles),
-                                        pos=Size(0, 0), rel_pos=RelPos(0.60, self.option_menu_height))
+                                    pos=Size(0, 0), rel_pos=RelPos(0.60, self.option_menu_height))
         self.search_button.widget.configure(state="disabled")
 
         self.widgets.append(self.search_button)
@@ -645,8 +649,10 @@ class NewsSearcherFrame(NonMainFrame):
             self.article_labels.append(article_label)
             self.widgets.append(article_label)
 
-    def article_label_change_color(self, widget, color):
+    @staticmethod
+    def article_label_change_color(widget, color):
         widget.configure(fg=color)
 
-    def open_link_in_browser(self, url):
+    @staticmethod
+    def open_link_in_browser(url):
         webbrowser.open_new(url)
